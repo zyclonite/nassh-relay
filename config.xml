@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<config>
+    <webservice>
+        <hostname>localhost</hostname>
+        <webport>8080</webport>
+    </webservice>
+    <application>
+        <relay-url>localhost:8080</relay-url>
+    </application>
+</config>
