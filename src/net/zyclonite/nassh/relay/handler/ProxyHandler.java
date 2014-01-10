@@ -77,7 +77,7 @@ public class ProxyHandler implements Handler<HttpServerRequest> {
                 request.response().end("host not allowed");
                 return;
             }
-            if(sessions.size() >= sessionlimit){
+            if (sessions.size() >= sessionlimit) {
                 request.response().setStatusCode(410);
                 request.response().end("session limit reached");
                 return;
@@ -158,15 +158,23 @@ public class ProxyHandler implements Handler<HttpServerRequest> {
         if (hosts instanceof Collection) {
             final int size = ((Collection) hosts).size();
             for (int i = 0; i < size; i++) {
-                final String hostblk = config.getString("application.blacklist.host(" + i + ")");
-                if (address.getHostName().equalsIgnoreCase(hostblk) || address.getHostAddress().equalsIgnoreCase(hostblk)) {
-                    return false;
+                try {
+                    final InetAddress hostblk = InetAddress.getByName(config.getString("application.blacklist.host(" + i + ")"));
+                    if (address.getHostAddress().equals(hostblk.getHostAddress())) {
+                        return false;
+                    }
+                } catch (UnknownHostException ex) {
+                    LOG.warn("Wrong host config for blacklist " + ex);
                 }
             }
         } else if (hosts instanceof String) {
-            final String hostblk = config.getString("application.blacklist.host");
-            if (address.getHostName().equalsIgnoreCase(hostblk) || address.getHostAddress().equalsIgnoreCase(hostblk)) {
-                return false;
+            try {
+                final InetAddress hostblk = InetAddress.getByName(config.getString("application.blacklist.host"));
+                if (address.getHostAddress().equals(hostblk.getHostAddress())) {
+                    return false;
+                }
+            } catch (UnknownHostException ex) {
+                LOG.warn("Wrong host config for blacklist " + ex);
             }
         }
         return true;
