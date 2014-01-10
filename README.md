@@ -2,7 +2,11 @@
 
 Relay Server for the Secure Shell Chromium plugin
 
-TODO - description
+## Documentation
+
+See https://github.com/zyclonite/nassh-relay/wiki/Manual for details
+
+## Demo
 
 To see nassh-relay in action go to: https://relay.wsn.at
 
