@@ -35,13 +35,13 @@ public class ReadHandler implements Handler<HttpServerRequest> {
 
     @Override
     public void handle(final HttpServerRequest request) {
+        request.response().putHeader("Access-Control-Allow-Origin", "chrome-extension://pnhechapfaindjhompbnflcldabbghjo");
+        request.response().putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+        request.response().putHeader("Pragma", "no-cache");
         if (request.params().contains("sid") && request.params().contains("rcnt")) {
             final UUID sid = UUID.fromString(request.params().get("sid"));
-            request.response().putHeader("Access-Control-Allow-Origin", "chrome-extension://pnhechapfaindjhompbnflcldabbghjo");
-            request.response().putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
-            request.response().putHeader("Pragma", "no-cache");
             final ConcurrentMap<String, Session> map = VertxPlatform.getInstance().getSharedData().getMap(Constants.SESSIONS);
-            if(!map.containsKey(sid.toString())){
+            if (!map.containsKey(sid.toString())) {
                 request.response().setStatusCode(410);
                 request.response().end();
                 return;

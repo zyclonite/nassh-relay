@@ -6,5 +6,16 @@
     </webservice>
     <application>
         <relay-url>localhost:8080</relay-url>
+        <max-sessions>100</max-sessions>
+        <blacklist>
+            <network>192.168.0.0/16</network>
+            <network>169.254.0.0/16</network>
+            <network>172.16.0.0/12</network>
+            <network>127.0.0.0/8</network>
+            <network>10.0.0.0/8</network>
+            <network>0.0.0.0/8</network>
+            <network>fe80::/10</network>
+            <host>93.186.192.89</host>
+        </blacklist>
     </application>
 </config>

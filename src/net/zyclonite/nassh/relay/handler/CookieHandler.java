@@ -31,12 +31,12 @@ public class CookieHandler implements Handler<HttpServerRequest> {
     @Override
     public void handle(final HttpServerRequest request) {
         LOG.debug("got request");
+        request.response().putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+        request.response().putHeader("Pragma", "no-cache");
         if (request.params().contains("ext") && request.params().contains("path")) {
             final String ext = request.params().get("ext");
             final String path = request.params().get("path");
             final String user = "test";
-            request.response().putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
-            request.response().putHeader("Pragma", "no-cache");
             request.response().putHeader("location", "chrome-extension://" + ext + "/" + path + "#" + user + "@" + config.getString("application.relay-url", "localhost:8080"));
             request.response().setStatusCode(302);
             request.response().end();
