@@ -1,0 +1,74 @@
+<html>
+<head>
+  <title>{{ APPLICATION_NAME }}</title>
+  <script type="text/javascript">
+  (function() {
+    var po = document.createElement('script');
+    po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://plus.google.com/js/client:plusone.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(po, s);
+  })();
+  </script>
+  <!-- JavaScript specific to this application that is not related to API
+     calls -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" ></script>
+</head>
+<body>
+  <div id="gConnect">
+    <button class="g-signin"
+        data-scope="profile"
+        data-clientId="{{ CLIENT_ID }}"
+        data-accesstype="offline"
+        data-callback="onSignInCallback"
+        data-theme="dark"
+        data-cookiepolicy="single_host_origin">
+    </button>
+  </div>
+  <div id="authOps" style="display:none">
+    <h2>User is now signed in to the app using Google+</h2>
+
+    <h2>Authentication Logs</h2>
+    <pre id="authResult"></pre>
+  </div>
+</body>
+<script type="text/javascript">
+var helper = (function() {
+  var authResult = undefined;
+
+  return {
+    onSignInCallback: function(authResult) {
+      $('#authResult').html('Auth Result:<br/>');
+      if (authResult['access_token']) {
+        this.authResult = authResult;
+        helper.connectServer();
+        $('#authResult').append('Logged in');
+        $('#authOps').show('slow');
+        $('#gConnect').hide();
+      } else if (authResult['error']) {
+        console.log('There was an error: ' + authResult['error']);
+        $('#authResult').append('Logged out');
+        $('#authOps').hide('slow');
+        $('#gConnect').show();
+      }
+    },
+    connectServer: function() {
+      $.ajax({
+        type: 'POST',
+        url: 'cookie?state={{ STATE }}',
+        contentType: 'application/octet-stream; charset=utf-8',
+        success: function(result) {
+          window.location.reload(false); 
+        },
+        processData: false,
+        data: this.authResult.code
+      });
+    },
+  };
+})();
+
+function onSignInCallback(authResult) {
+  helper.onSignInCallback(authResult);
+}
+</script>
+</html>
