@@ -18,6 +18,7 @@ import net.zyclonite.nassh.relay.model.Session;
 import net.zyclonite.nassh.relay.service.VertxPlatform;
 import net.zyclonite.nassh.relay.util.AppConfig;
 import net.zyclonite.nassh.relay.util.Constants;
+import net.zyclonite.nassh.relay.util.CookieHelper;
 import net.zyclonite.nassh.relay.util.NetworkHelper;
 import net.zyclonite.nassh.relay.util.NoSuchQueueException;
 import net.zyclonite.nassh.relay.util.QueueFactory;
@@ -41,10 +42,13 @@ public class ProxyHandler implements Handler<HttpServerRequest> {
     private static final Log LOG = LogFactory.getLog(ProxyHandler.class);
     private final ConcurrentMap<String, Session> sessions;
     private final int sessionlimit;
+    private final boolean authentication;
 
     public ProxyHandler() {
+        final AppConfig config = AppConfig.getInstance();
+        authentication = config.getBoolean("application.authentication", true);
         sessions = VertxPlatform.getInstance().getSharedData().getMap(Constants.SESSIONS);
-        sessionlimit = AppConfig.getInstance().getInt("application.max-sessions", 100);
+        sessionlimit = config.getInt("application.max-sessions", 100);
     }
 
     @Override
@@ -55,6 +59,14 @@ public class ProxyHandler implements Handler<HttpServerRequest> {
         request.response().putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
         request.response().putHeader("Pragma", "no-cache");
         if (request.params().contains("host") && request.params().contains("port")) {
+            if(authentication){
+                final String gplusid = CookieHelper.validateCookie(request);
+                if(gplusid == null){
+                    request.response().setStatusCode(410);
+                    request.response().end("session invalid");
+                    return;
+                }
+            }
             final String host = request.params().get("host");
             final int port = Integer.parseInt(request.params().get("port"));
             final UUID sid = UUID.randomUUID();
@@ -114,7 +126,7 @@ public class ProxyHandler implements Handler<HttpServerRequest> {
                     asyncResult.result().closeHandler(new VoidHandler() {
                         @Override
                         public void handle() {
-                            LOG.info("ssh server connection closed" + host + ":" + port);
+                            LOG.info("ssh server connection closed " + host + ":" + port);
                             QueueFactory.deleteQueue(sid.toString());
                             sessions.remove(sid.toString());
                         }

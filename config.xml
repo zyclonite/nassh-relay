@@ -5,6 +5,7 @@
         <webport>8080</webport>
     </webservice>
     <application>
+        <authentication>true</authentication>
         <relay-url>localhost:8080</relay-url>
         <max-sessions>100</max-sessions>
         <blacklist>

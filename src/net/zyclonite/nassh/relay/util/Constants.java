@@ -15,4 +15,5 @@ package net.zyclonite.nassh.relay.util;
  */
 public class Constants {
     public final static String SESSIONS = "map.sessions";
+    public final static String SESSIONCOOKIE = "JSESSIONID";
 }

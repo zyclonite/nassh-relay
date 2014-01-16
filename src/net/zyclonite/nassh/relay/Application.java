@@ -29,6 +29,7 @@ public class Application {
 
     public Application() {
         platform = VertxPlatform.getInstance();
+        platform.deployVerticle("net.zyclonite.nassh.relay.verticle.WebService");
     }
 
     /**

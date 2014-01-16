@@ -53,6 +53,14 @@
        <priority value="WARN"/>
    </category>
 
+   <category name="com.google">
+      <priority value="INFO"/>
+   </category>
+
+   <category name="sun.net">
+      <priority value="INFO"/>
+   </category>
+
    <root>
       <priority value="INFO" />
       <appender-ref ref="ASYNC" />

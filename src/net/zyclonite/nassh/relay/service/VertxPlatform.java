@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.EventBus;
+import org.vertx.java.core.file.FileSystem;
 import org.vertx.java.core.net.NetClient;
 import org.vertx.java.core.shareddata.SharedData;
 import org.vertx.java.platform.PlatformLocator;
@@ -37,11 +38,10 @@ public class VertxPlatform implements Handler<AsyncResult<String>> {
 
     private VertxPlatform() {
         mgr = PlatformLocator.factory.createPlatformManager();
-        init();
     }
 
-    private void init() {
-        mgr.deployVerticle("net.zyclonite.nassh.relay.verticle.WebService", null, getClassPathAsURLArray(), 1, null, this);
+    public void deployVerticle(final String verticle) {
+        mgr.deployVerticle(verticle, null, getClassPathAsURLArray(), 1, null, this);
     }
 
     public SharedData getSharedData() {
@@ -50,6 +50,10 @@ public class VertxPlatform implements Handler<AsyncResult<String>> {
 
     public EventBus getEventBus() {
         return mgr.vertx().eventBus();
+    }
+
+    public FileSystem getFileSystem() {
+        return mgr.vertx().fileSystem();
     }
 
     public NetClient createNetClient() {
@@ -82,9 +86,9 @@ public class VertxPlatform implements Handler<AsyncResult<String>> {
     @Override
     public void handle(AsyncResult<String> done) {
         if(done.succeeded()){
-            LOG.info("WebService deployed");
+            LOG.debug("Verticle deployed " + done.result());
         }else{
-            LOG.error("WebService NOT deployed " + done.result());
+            LOG.error("Verticle NOT deployed " + done.cause().getMessage());
         }
     }
 }
