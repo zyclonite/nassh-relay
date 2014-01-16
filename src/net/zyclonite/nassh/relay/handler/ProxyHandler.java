@@ -18,7 +18,7 @@ import net.zyclonite.nassh.relay.model.Session;
 import net.zyclonite.nassh.relay.service.VertxPlatform;
 import net.zyclonite.nassh.relay.util.AppConfig;
 import net.zyclonite.nassh.relay.util.Constants;
-import net.zyclonite.nassh.relay.util.CookieHelper;
+import net.zyclonite.nassh.relay.util.WebHelper;
 import net.zyclonite.nassh.relay.util.NetworkHelper;
 import net.zyclonite.nassh.relay.util.NoSuchQueueException;
 import net.zyclonite.nassh.relay.util.QueueFactory;
@@ -56,13 +56,13 @@ public class ProxyHandler implements Handler<HttpServerRequest> {
     public void handle(final HttpServerRequest request) {
         LOG.debug("got request");
         String gplusid = null;
-        request.response().putHeader("Access-Control-Allow-Origin", "chrome-extension://pnhechapfaindjhompbnflcldabbghjo");
+        WebHelper.putAccessControlAllowHeader(request);
         request.response().putHeader("Access-Control-Allow-Credentials", "true");
         request.response().putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
         request.response().putHeader("Pragma", "no-cache");
         if (request.params().contains("host") && request.params().contains("port")) {
             if (authentication) {
-                gplusid = CookieHelper.validateCookie(request);
+                gplusid = WebHelper.validateCookie(request);
                 if (gplusid == null) {
                     request.response().setStatusCode(410);
                     request.response().end("session invalid");

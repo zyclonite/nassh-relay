@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentMap;
 import net.zyclonite.nassh.relay.model.Session;
 import net.zyclonite.nassh.relay.service.VertxPlatform;
 import net.zyclonite.nassh.relay.util.Constants;
+import net.zyclonite.nassh.relay.util.WebHelper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,7 +32,7 @@ public class WriteHandler implements Handler<HttpServerRequest> {
 
     @Override
     public void handle(final HttpServerRequest request) {
-        request.response().putHeader("Access-Control-Allow-Origin", "chrome-extension://pnhechapfaindjhompbnflcldabbghjo");
+        WebHelper.putAccessControlAllowHeader(request);
         request.response().putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
         request.response().putHeader("Pragma", "no-cache");
         if (request.params().contains("sid") && request.params().contains("wcnt") && request.params().contains("data")) {

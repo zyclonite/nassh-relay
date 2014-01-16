@@ -17,7 +17,7 @@ import net.zyclonite.nassh.relay.model.AuthSession;
 import net.zyclonite.nassh.relay.util.AppConfig;
 import net.zyclonite.nassh.relay.util.AuthSessionManager;
 import net.zyclonite.nassh.relay.util.Constants;
-import net.zyclonite.nassh.relay.util.CookieHelper;
+import net.zyclonite.nassh.relay.util.WebHelper;
 import net.zyclonite.nassh.relay.verticle.WebService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,7 +54,7 @@ public class CookieHandler implements Handler<HttpServerRequest> {
                 request.response().end();
                 return;
             }
-            final String gplusid = CookieHelper.validateCookie(request);
+            final String gplusid = WebHelper.validateCookie(request);
             if (gplusid != null) {
                 request.response().putHeader("location", "chrome-extension://" + ext + "/" + path + "#" + gplusid + "@" + config.getString("application.relay-url", "localhost:8080"));
                 request.response().setStatusCode(302);

@@ -18,6 +18,7 @@ import net.zyclonite.nassh.relay.util.NoSuchQueueException;
 import net.zyclonite.nassh.relay.util.QueueFactory;
 import net.zyclonite.nassh.relay.util.TransferObserver;
 import net.zyclonite.nassh.relay.util.TransferQueue;
+import net.zyclonite.nassh.relay.util.WebHelper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,7 +36,7 @@ public class ReadHandler implements Handler<HttpServerRequest> {
 
     @Override
     public void handle(final HttpServerRequest request) {
-        request.response().putHeader("Access-Control-Allow-Origin", "chrome-extension://pnhechapfaindjhompbnflcldabbghjo");
+        WebHelper.putAccessControlAllowHeader(request);
         request.response().putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
         request.response().putHeader("Pragma", "no-cache");
         if (request.params().contains("sid") && request.params().contains("rcnt")) {

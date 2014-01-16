@@ -9,6 +9,9 @@
  */
 package net.zyclonite.nassh.relay.util;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  *
  * @author zyclonite
@@ -16,4 +19,5 @@ package net.zyclonite.nassh.relay.util;
 public class Constants {
     public final static String SESSIONS = "map.sessions";
     public final static String SESSIONCOOKIE = "JSESSIONID";
+    public final static List<String> origins = Arrays.asList("chrome-extension://okddffdblfhhnmhodogpojmfkjmhinfp", "chrome-extension://pnhechapfaindjhompbnflcldabbghjo");
 }

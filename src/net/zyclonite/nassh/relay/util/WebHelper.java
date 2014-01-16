@@ -20,7 +20,7 @@ import org.vertx.java.core.http.HttpServerRequest;
  *
  * @author zyclonite
  */
-public class CookieHelper {
+public class WebHelper {
 
     public static String validateCookie(final HttpServerRequest request) {
         if (!request.headers().contains("Cookie")) {
@@ -44,5 +44,18 @@ public class CookieHelper {
             return gplusid;
         }
         return null;
+    }
+
+    public static void putAccessControlAllowHeader(final HttpServerRequest request) {
+        if (!request.headers().contains("Origin")) {
+            return;
+        }
+        final String reqorigin = request.headers().get("Origin");
+        for (final String origin : Constants.origins) {
+            if (origin.equals(reqorigin)) {
+                request.response().putHeader("Access-Control-Allow-Origin", reqorigin);
+                return;
+            }
+        }
     }
 }
