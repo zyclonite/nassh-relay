@@ -43,9 +43,10 @@ public class ProxyHandler implements Handler<HttpServerRequest> {
     private final ConcurrentMap<String, Session> sessions;
     private final int sessionlimit;
     private final boolean authentication;
+    private final AppConfig config;
 
     public ProxyHandler() {
-        final AppConfig config = AppConfig.getInstance();
+        config = AppConfig.getInstance();
         authentication = config.getBoolean("application.authentication", true);
         sessions = VertxPlatform.getInstance().getSharedData().getMap(Constants.SESSIONS);
         sessionlimit = config.getInt("application.max-sessions", 100);
@@ -54,14 +55,15 @@ public class ProxyHandler implements Handler<HttpServerRequest> {
     @Override
     public void handle(final HttpServerRequest request) {
         LOG.debug("got request");
+        String gplusid = null;
         request.response().putHeader("Access-Control-Allow-Origin", "chrome-extension://pnhechapfaindjhompbnflcldabbghjo");
         request.response().putHeader("Access-Control-Allow-Credentials", "true");
         request.response().putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
         request.response().putHeader("Pragma", "no-cache");
         if (request.params().contains("host") && request.params().contains("port")) {
-            if(authentication){
-                final String gplusid = CookieHelper.validateCookie(request);
-                if(gplusid == null){
+            if (authentication) {
+                gplusid = CookieHelper.validateCookie(request);
+                if (gplusid == null) {
                     request.response().setStatusCode(410);
                     request.response().end("session invalid");
                     return;
@@ -84,7 +86,7 @@ public class ProxyHandler implements Handler<HttpServerRequest> {
                 request.response().end("invalid host");
                 return;
             }
-            if (!isHostAllowed(address)) {
+            if (!isHostAllowed(address, gplusid)) {
                 request.response().setStatusCode(410);
                 request.response().end("host not allowed");
                 return;
@@ -141,54 +143,94 @@ public class ProxyHandler implements Handler<HttpServerRequest> {
         });
     }
 
+    private boolean isHostAllowed(final InetAddress address, final String userid) {
+        if (userid != null) {
+            final Object users = config.getProperty("accesslist.user.id");
+            if (users instanceof Collection) {
+                final int size = ((Collection) users).size();
+                for (int i = 0; i < size; i++) {
+                    if (userid.equals(config.getString("accesslist.user(" + i + ").id"))) {
+                        if (checkBlockNetwork("accesslist.user(" + i + ").network", address, false)) {
+                            return true;
+                        }
+                        if (checkBlockHost("accesslist.user(" + i + ").host", address, false)) {
+                            return true;
+                        }
+                    }
+                }
+            } else if (users instanceof String) {
+                if (userid.equals(config.getString("accesslist.user.id"))) {
+                    if (checkBlockNetwork("accesslist.user.network", address, false)) {
+                        return true;
+                    }
+                    if (checkBlockHost("accesslist.user.host", address, false)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return isHostAllowed(address);
+    }
+
     private boolean isHostAllowed(final InetAddress address) {
-        final AppConfig config = AppConfig.getInstance();
-        final Object networks = config.getProperty("application.blacklist.network");
-        if (networks instanceof Collection) {
-            final int size = ((Collection) networks).size();
+        if (checkBlockNetwork("application.blacklist.network", address, true)) {
+            return checkBlockHost("application.blacklist.host", address, true);
+        } else {
+            return false;
+        }
+    }
+
+    private boolean checkBlockHost(final String block, final InetAddress address, final boolean blacklist) {
+        final Object entries = config.getProperty(block);
+        if (entries instanceof Collection) {
+            final int size = ((Collection) entries).size();
             for (int i = 0; i < size; i++) {
                 try {
-                    final NetworkHelper netblk = new NetworkHelper(config.getString("application.blacklist.network(" + i + ")"));
+                    final InetAddress blk = InetAddress.getByName(config.getString(block + "(" + i + ")"));
+                    if (address.getHostAddress().equals(blk.getHostAddress())) {
+                        return !blacklist;
+                    }
+                } catch (UnknownHostException ex) {
+                    LOG.warn("Configuration error at " + block + "(" + i + ") " + ex);
+                }
+            }
+        } else if (entries instanceof String) {
+            try {
+                final InetAddress blk = InetAddress.getByName(config.getString(block));
+                if (address.getHostAddress().equals(blk.getHostAddress())) {
+                    return !blacklist;
+                }
+            } catch (UnknownHostException ex) {
+                LOG.warn("Configuration error at " + block + " " + ex);
+            }
+        }
+        return blacklist;
+    }
+
+    private boolean checkBlockNetwork(final String block, final InetAddress address, final boolean blacklist) {
+        final Object entries = config.getProperty(block);
+        if (entries instanceof Collection) {
+            final int size = ((Collection) entries).size();
+            for (int i = 0; i < size; i++) {
+                try {
+                    final NetworkHelper netblk = new NetworkHelper(config.getString(block + "(" + i + ")"));
                     if (netblk.isInRange(address)) {
-                        return false;
+                        return !blacklist;
                     }
                 } catch (UnknownHostException ex) {
-                    LOG.warn("Wrong network range config for blacklist " + ex);
+                    LOG.warn("Configuration error at " + block + "(" + i + ") " + ex);
                 }
             }
-        } else if (networks instanceof String) {
+        } else if (entries instanceof String) {
             try {
-                final NetworkHelper netblk = new NetworkHelper(config.getString("application.blacklist.network"));
+                final NetworkHelper netblk = new NetworkHelper(config.getString(block));
                 if (netblk.isInRange(address)) {
-                    return false;
+                    return !blacklist;
                 }
             } catch (UnknownHostException ex) {
-                LOG.warn("Wrong network range config for blacklist " + ex);
+                LOG.warn("Configuration error at " + block + " " + ex);
             }
         }
-        final Object hosts = config.getProperty("application.blacklist.host");
-        if (hosts instanceof Collection) {
-            final int size = ((Collection) hosts).size();
-            for (int i = 0; i < size; i++) {
-                try {
-                    final InetAddress hostblk = InetAddress.getByName(config.getString("application.blacklist.host(" + i + ")"));
-                    if (address.getHostAddress().equals(hostblk.getHostAddress())) {
-                        return false;
-                    }
-                } catch (UnknownHostException ex) {
-                    LOG.warn("Wrong host config for blacklist " + ex);
-                }
-            }
-        } else if (hosts instanceof String) {
-            try {
-                final InetAddress hostblk = InetAddress.getByName(config.getString("application.blacklist.host"));
-                if (address.getHostAddress().equals(hostblk.getHostAddress())) {
-                    return false;
-                }
-            } catch (UnknownHostException ex) {
-                LOG.warn("Wrong host config for blacklist " + ex);
-            }
-        }
-        return true;
+        return blacklist;
     }
 }

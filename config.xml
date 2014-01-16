@@ -19,4 +19,11 @@
             <host>93.186.192.89</host>
         </blacklist>
     </application>
+    <accesslist>
+        <user>
+            <id>106115425408777447603</id>
+            <network>192.168.0.0/16</network>
+            <host>127.0.0.1</host>
+        </user>
+    </accesslist>
 </config>
