@@ -19,5 +19,5 @@ import java.util.List;
 public class Constants {
     public final static String SESSIONS = "map.sessions";
     public final static String SESSIONCOOKIE = "JSESSIONID";
-    public final static List<String> origins = Arrays.asList("chrome-extension://okddffdblfhhnmhodogpojmfkjmhinfp", "chrome-extension://pnhechapfaindjhompbnflcldabbghjo");
+    public final static List<String> ORIGINS = Arrays.asList("chrome-extension://okddffdblfhhnmhodogpojmfkjmhinfp", "chrome-extension://pnhechapfaindjhompbnflcldabbghjo");
 }

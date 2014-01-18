@@ -32,12 +32,11 @@ public class CookieHandler implements Handler<HttpServerRequest> {
 
     private static final Log LOG = LogFactory.getLog(CookieHandler.class);
     private static final String STATIC_FILE = "/net/zyclonite/nassh/relay/html/auth.html";
-    private final AppConfig config;
+    private static final AppConfig CONFIG = AppConfig.getInstance();
     private final boolean authentication;
 
     public CookieHandler() {
-        config = AppConfig.getInstance();
-        authentication = config.getBoolean("application.authentication", true);
+        authentication = CONFIG.getBoolean("application.authentication", true);
     }
 
     @Override
@@ -49,14 +48,14 @@ public class CookieHandler implements Handler<HttpServerRequest> {
             final String ext = request.params().get("ext");
             final String path = request.params().get("path");
             if(!authentication){
-                request.response().putHeader("location", "chrome-extension://" + ext + "/" + path + "#anonymous@" + config.getString("application.relay-url", "localhost:8080"));
+                request.response().putHeader("location", "chrome-extension://" + ext + "/" + path + "#anonymous@" + CONFIG.getString("application.relay-url", "localhost:8080"));
                 request.response().setStatusCode(302);
                 request.response().end();
                 return;
             }
             final String gplusid = WebHelper.validateCookie(request);
             if (gplusid != null) {
-                request.response().putHeader("location", "chrome-extension://" + ext + "/" + path + "#" + gplusid + "@" + config.getString("application.relay-url", "localhost:8080"));
+                request.response().putHeader("location", "chrome-extension://" + ext + "/" + path + "#" + gplusid + "@" + CONFIG.getString("application.relay-url", "localhost:8080"));
                 request.response().setStatusCode(302);
                 request.response().end();
             } else {

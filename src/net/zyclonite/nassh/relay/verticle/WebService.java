@@ -37,6 +37,7 @@ import org.vertx.java.platform.Verticle;
 public class WebService extends Verticle {
 
     private static final Log LOG = LogFactory.getLog(WebService.class);
+    private static final AppConfig CONFIG = AppConfig.getInstance();
     public static final HttpTransport TRANSPORT = new NetHttpTransport();
     public static final GsonFactory JSON_FACTORY = new GsonFactory();
     public static final Gson GSON = new Gson();
@@ -52,11 +53,10 @@ public class WebService extends Verticle {
     }
     public static final String CLIENT_ID = clientSecrets.getWeb().getClientId();
     public static final String CLIENT_SECRET = clientSecrets.getWeb().getClientSecret();
-    public static final String APPLICATION_NAME = "nassh-relay-authentication-provider";
+    public static final String APPLICATION_NAME = "nassh-relay g+ Single Sign On";
 
     @Override
     public void start() {
-        final AppConfig config = AppConfig.getInstance();
         final HttpServer server = vertx.createHttpServer();
         RouteMatcher routeMatcher = new RouteMatcher();
         routeMatcher.get("/cookie", new CookieHandler());
@@ -66,7 +66,7 @@ public class WebService extends Verticle {
         routeMatcher.get("/read", new ReadHandler());
         server.requestHandler(routeMatcher);
         server.websocketHandler(new ConnectHandler());
-        server.listen(config.getInteger("webservice.webport", 8080), config.getString("webservice.hostname", "localhost"));
+        server.listen(CONFIG.getInteger("webservice.webport", 8080), CONFIG.getString("webservice.hostname", "localhost"));
         LOG.info("WebService initialized");
     }
 }

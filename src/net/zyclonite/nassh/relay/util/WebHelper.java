@@ -51,7 +51,7 @@ public class WebHelper {
             return;
         }
         final String reqorigin = request.headers().get("Origin");
-        for (final String origin : Constants.origins) {
+        for (final String origin : Constants.ORIGINS) {
             if (origin.equals(reqorigin)) {
                 request.response().putHeader("Access-Control-Allow-Origin", reqorigin);
                 return;
