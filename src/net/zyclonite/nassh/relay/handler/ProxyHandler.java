@@ -87,11 +87,13 @@ public class ProxyHandler implements Handler<HttpServerRequest> {
             if (!AccessHelper.isHostAllowed(address, gplusid)) {
                 request.response().setStatusCode(410);
                 request.response().end("host not allowed");
+                LOG.warn("client " + clienthost + " " + (gplusid == null ? "" : "(" + gplusid + ")") + "tried to access " + address.getHostAddress() + " but was not allowed");
                 return;
             }
             if (sessions.size() >= sessionlimit) {
                 request.response().setStatusCode(410);
                 request.response().end("session limit reached");
+                LOG.warn("ssh session limit of " + sessionlimit + " reached");
                 return;
             }
             request.response().setStatusCode(200);
