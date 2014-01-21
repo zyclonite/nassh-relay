@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 public class AppConfig extends XMLConfiguration {
 
     private static final Log LOG = LogFactory.getLog(AppConfig.class);
-    private static AppConfig instance;
+    private static final AppConfig instance;
     private static final String configFile = "config.xml";
 
     static {

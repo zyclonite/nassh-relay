@@ -12,6 +12,7 @@
     <import file="nbproject/build-impl.xml"/>
     <target name="-post-jar">
         <copy file="config.xml" tofile="${dist.dir}/config.xml"/>
+        <copy file="client_secrets.json" tofile="${dist.dir}/client_secrets.json"/>
     </target>
     <!--
 

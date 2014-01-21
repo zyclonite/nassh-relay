@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import net.zyclonite.nassh.relay.model.AuthSession;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -22,6 +24,7 @@ import net.zyclonite.nassh.relay.model.AuthSession;
  */
 public class AuthSessionManager {
 
+    private static final Log LOG = LogFactory.getLog(AuthSessionManager.class);
     private final static Map<UUID, AuthSession> STORE = new HashMap<>();
     private final static Map<UUID, Date> TIME = new HashMap<>();
     private static int ttl = 600; //default 10 min
@@ -42,6 +45,7 @@ public class AuthSessionManager {
     public static AuthSession getSession(final UUID id) {
         checkExpiration();
         if (STORE.containsKey(id)) {
+            TIME.put(id, new Date());
             return STORE.get(id);
         } else {
             return null;
@@ -59,12 +63,15 @@ public class AuthSessionManager {
 
     private static void checkExpiration() {
         final long now = (new Date()).getTime();
-        if(lastcheck+(10*1000) < now){
+        LOG.debug(now+" "+lastcheck);
+        if(lastcheck+(10*1000) > now){
             return;
         }
         for(final Entry<UUID, Date> set:TIME.entrySet()) {
             if((set.getValue().getTime()+(ttl*1000)) < now){
-                removeSession(set.getKey());
+                final UUID key = set.getKey();
+                LOG.debug("Removed session "+key);
+                removeSession(key);
             }
         }
         lastcheck = now;
