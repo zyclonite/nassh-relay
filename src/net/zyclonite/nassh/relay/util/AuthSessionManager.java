@@ -10,10 +10,10 @@
 package net.zyclonite.nassh.relay.util;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import net.zyclonite.nassh.relay.model.AuthSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,8 +25,8 @@ import org.apache.commons.logging.LogFactory;
 public class AuthSessionManager {
 
     private static final Log LOG = LogFactory.getLog(AuthSessionManager.class);
-    private final static Map<UUID, AuthSession> STORE = new HashMap<>();
-    private final static Map<UUID, Date> TIME = new HashMap<>();
+    private final static Map<UUID, AuthSession> STORE = new ConcurrentHashMap<>();
+    private final static Map<UUID, Date> TIME = new ConcurrentHashMap<>();
     private static int ttl = 600; //default 10 min
     private static long lastcheck = (new Date()).getTime();
 
@@ -51,10 +51,10 @@ public class AuthSessionManager {
             return null;
         }
     }
-    
+
     public static void removeSession(final UUID id) {
-        if(TIME.containsKey(id)){
-            if(STORE.containsKey(id)) {
+        if (TIME.containsKey(id)) {
+            if (STORE.containsKey(id)) {
                 STORE.remove(id);
             }
             TIME.remove(id);
@@ -63,14 +63,14 @@ public class AuthSessionManager {
 
     private static void checkExpiration() {
         final long now = (new Date()).getTime();
-        LOG.debug(now+" "+lastcheck);
-        if(lastcheck+(10*1000) > now){
+        LOG.debug(now + " " + lastcheck);
+        if (lastcheck + (10 * 1000) > now) {
             return;
         }
-        for(final Entry<UUID, Date> set:TIME.entrySet()) {
-            if((set.getValue().getTime()+(ttl*1000)) < now){
+        for (final Entry<UUID, Date> set : TIME.entrySet()) {
+            if ((set.getValue().getTime() + (ttl * 1000)) < now) {
                 final UUID key = set.getKey();
-                LOG.debug("Removed session "+key);
+                LOG.debug("Removed session " + key);
                 removeSession(key);
             }
         }
