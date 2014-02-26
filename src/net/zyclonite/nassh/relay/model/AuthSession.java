@@ -20,7 +20,7 @@ import java.util.UUID;
 public class AuthSession {
 
     private final UUID id;
-    private Map<String, String> keyvalues = new HashMap<>();
+    private final Map<String, String> keyvalues = new HashMap<>();
 
     public AuthSession() {
         id = UUID.randomUUID();
