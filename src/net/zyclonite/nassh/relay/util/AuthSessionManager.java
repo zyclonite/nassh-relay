@@ -44,7 +44,7 @@ public class AuthSessionManager {
 
     public static AuthSession getSession(final UUID id) {
         checkExpiration();
-        if (STORE.containsKey(id)) {
+        if ((id != null) && (STORE.containsKey(id))) {
             TIME.put(id, new Date());
             return STORE.get(id);
         } else {
