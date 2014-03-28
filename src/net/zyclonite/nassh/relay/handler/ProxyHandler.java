@@ -136,9 +136,28 @@ public class ProxyHandler implements Handler<HttpServerRequest> {
                     final Session session = new Session();
                     session.setHandler(asyncResult.result().writeHandlerID());
                     sessions.put(sid.toString(), session);
+                    registerTimerOut(session, client);
                 } else {
                     LOG.warn("Could not connect to ssh server: " + asyncResult.cause().getMessage(), asyncResult.cause().fillInStackTrace());
                 }
+            }
+        });
+    }
+
+    private void registerTimerOut(final Session session, final NetClient client) {
+        VertxPlatform.getInstance().setPeriodic(CONFIG.getInt("application.tcp-session-timeout", 60)*1000, new Handler<Long>() {
+            private int readCount = 0;
+            private int writeCount = 0;
+            @Override
+            public void handle(Long timerID) {
+                if((session.getRead_count() <= readCount) && (session.getWrite_count() <= writeCount)) {
+                    if(client != null) {
+                        client.close();
+                    }
+                    VertxPlatform.getInstance().cancelTimer(timerID);
+                }
+                readCount = session.getRead_count();
+                writeCount = session.getWrite_count();
             }
         });
     }

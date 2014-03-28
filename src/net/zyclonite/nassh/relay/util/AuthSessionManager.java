@@ -25,14 +25,10 @@ import org.apache.commons.logging.LogFactory;
 public class AuthSessionManager {
 
     private static final Log LOG = LogFactory.getLog(AuthSessionManager.class);
+    private static final AppConfig CONFIG = AppConfig.getInstance();
     private final static Map<UUID, AuthSession> STORE = new ConcurrentHashMap<>();
     private final static Map<UUID, Date> TIME = new ConcurrentHashMap<>();
-    private static int ttl = 600; //default 10 min
     private static long lastcheck = (new Date()).getTime();
-
-    public static void setTTL(final int ttl_new) {
-        ttl = ttl_new;
-    }
 
     public static AuthSession createSession() {
         checkExpiration();
@@ -62,6 +58,7 @@ public class AuthSessionManager {
     }
 
     private static void checkExpiration() {
+        final int ttl = CONFIG.getInt("application.auth-session-timeout", 600);
         final long now = (new Date()).getTime();
         LOG.debug(now + " " + lastcheck);
         if (lastcheck + (10 * 1000) > now) {

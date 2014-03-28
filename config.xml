@@ -8,6 +8,8 @@
         <authentication>true</authentication>
         <relay-url>localhost:8080</relay-url>
         <max-sessions>100</max-sessions>
+        <tcp-session-timeout>60</tcp-session-timeout>
+        <auth-session-timeout>600</auth-session-timeout>
         <blacklist>
             <network>192.168.0.0/16</network>
             <network>169.254.0.0/16</network>

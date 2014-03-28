@@ -60,6 +60,14 @@ public class VertxPlatform implements Handler<AsyncResult<String>> {
         return mgr.vertx().createNetClient();
     }
 
+    public long setPeriodic(long time, Handler<Long> handler) {
+        return mgr.vertx().setPeriodic(time, handler);
+    }
+    
+    public boolean cancelTimer(long id) {
+        return mgr.vertx().cancelTimer(id);
+    }
+
     public void stop() {
         mgr.stop();
     }
