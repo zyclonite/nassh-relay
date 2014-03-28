@@ -26,33 +26,27 @@ import org.vertx.java.core.http.ServerWebSocket;
 public class TransferObserver implements Observer {
 
     private static final Log LOG = LogFactory.getLog(TransferObserver.class);
-    private HttpServerRequest request = null;
-    private ServerWebSocket websocket = null;
+    private Object request = null;
     private Session session = null;
 
-    public TransferObserver(final Session session, final HttpServerRequest request) {
+    public TransferObserver(final Session session, final Object request) {
         this.request = request;
-        this.session = session;
-    }
-
-    public TransferObserver(final Session session, final ServerWebSocket websocket) {
-        this.websocket = websocket;
         this.session = session;
     }
 
     @Override
     public void update(final Observable queue, final Object arg) {
         final Buffer buffer = ((TransferQueue) queue).poll();
-        if (request != null) {
+        if (request instanceof HttpServerRequest) {
             queue.deleteObserver(this);
             final String encodedBytes = Base64.encodeBase64URLSafeString(buffer.getBytes());
-            request.response().setStatusCode(200);
-            request.response().end(encodedBytes);
-        }else if (websocket != null) {
+            ((HttpServerRequest)request).response().setStatusCode(200);
+            ((HttpServerRequest)request).response().end(encodedBytes);
+        }else if (request instanceof ServerWebSocket) {
             final Buffer ackbuffer = new Buffer();
             ackbuffer.setInt(0, session.getWrite_count());
             ackbuffer.setBuffer(4, buffer);
-            websocket.write(ackbuffer);
+            ((ServerWebSocket)request).write(ackbuffer);
         }else{
             queue.deleteObserver(this);
         }

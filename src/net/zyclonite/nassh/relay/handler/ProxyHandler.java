@@ -145,12 +145,13 @@ public class ProxyHandler implements Handler<HttpServerRequest> {
     }
 
     private void registerTimerOut(final Session session, final NetClient client) {
-        VertxPlatform.getInstance().setPeriodic(CONFIG.getInt("application.tcp-session-timeout", 60)*1000, new Handler<Long>() {
+        VertxPlatform.getInstance().setPeriodic(CONFIG.getInt("application.tcp-session-timeout", 1200)*1000, new Handler<Long>() {
             private int readCount = 0;
             private int writeCount = 0;
             @Override
             public void handle(Long timerID) {
                 if((session.getRead_count() <= readCount) && (session.getWrite_count() <= writeCount)) {
+                    session.setActive(false);
                     if(client != null) {
                         client.close();
                     }

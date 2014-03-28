@@ -49,6 +49,10 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
                 return;
             }
             final Session session = map.get(sid.toString());
+            if(!session.isActive()){
+                ws.reject();
+                return;
+            }
             session.setRead_count(Integer.parseInt(params.get("ack")));
             session.setWrite_count(Integer.parseInt(params.get("pos")));
             final TransferObserver observer = new TransferObserver(session, ws);
@@ -58,6 +62,7 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
             } catch (NoSuchQueueException ex) {
                 LOG.warn(ex, ex.fillInStackTrace());
                 ws.reject();
+                ws.close();
                 return;
             }
             if (queue.countObservers() == 0) {
@@ -74,6 +79,10 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
             ws.dataHandler(new Handler<Buffer>() {
                 @Override
                 public void handle(final Buffer data) {
+                    if(!session.isActive()) {
+                        ws.close();
+                        return;
+                    }
                     if (data.length() < 4) {
                         LOG.warn("wrong frame format");
                         return;

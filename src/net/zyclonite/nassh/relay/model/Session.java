@@ -19,6 +19,7 @@ public class Session implements Shareable {
     private String handler;
     private int write_count;
     private int read_count;
+    private boolean active = true;
 
     /**
      * @return the handler
@@ -60,5 +61,19 @@ public class Session implements Shareable {
      */
     public void setRead_count(int read_count) {
         this.read_count = read_count;
+    }
+
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
