@@ -18,9 +18,10 @@ import net.zyclonite.nassh.relay.service.VertxPlatform;
 import net.zyclonite.nassh.relay.util.AccessHelper;
 import net.zyclonite.nassh.relay.util.AppConfig;
 import net.zyclonite.nassh.relay.util.Constants;
-import net.zyclonite.nassh.relay.util.WebHelper;
 import net.zyclonite.nassh.relay.util.NoSuchQueueException;
 import net.zyclonite.nassh.relay.util.QueueFactory;
+import net.zyclonite.nassh.relay.util.TransferQueue;
+import net.zyclonite.nassh.relay.util.WebHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.vertx.java.core.AsyncResult;
@@ -111,15 +112,26 @@ public class ProxyHandler implements Handler<HttpServerRequest> {
         client.setReconnectInterval(500);
         client.connect(port, host, new AsyncResultHandler<NetSocket>() {
             @Override
-            public void handle(AsyncResult<NetSocket> asyncResult) {
+            public void handle(final AsyncResult<NetSocket> asyncResult) {
                 if (asyncResult.succeeded()) {
                     LOG.info("Connected to ssh server: " + host + ":" + port + " (" + clienthost + ")");
                     QueueFactory.createQueue(sid.toString());
+                    asyncResult.result().drainHandler(new VoidHandler() {
+                        @Override
+                        public void handle() {
+                            asyncResult.result().resume();
+                        }
+                    });
                     asyncResult.result().dataHandler(new Handler<Buffer>() {
                         @Override
                         public void handle(final Buffer buffer) {
                             try {
-                                QueueFactory.getQueue(sid.toString()).add(buffer);
+                                final TransferQueue queue = QueueFactory.getQueue(sid.toString());
+                                if(!queue.isFull()) {
+                                    queue.add(buffer);
+                                }else{
+                                    asyncResult.result().pause();
+                                }
                             } catch (NoSuchQueueException ex) {
                                 LOG.warn(ex, ex.fillInStackTrace());
                             }

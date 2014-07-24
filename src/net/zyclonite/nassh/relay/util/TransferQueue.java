@@ -39,6 +39,13 @@ public class TransferQueue extends Observable implements Queue<Buffer> {
         return false;
     }
 
+    public boolean isFull() {
+        if(queue.size() >= Constants.QUEUEMAXSIZE) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean offer(Buffer e) {
         throw new UnsupportedOperationException("Not supported yet.");

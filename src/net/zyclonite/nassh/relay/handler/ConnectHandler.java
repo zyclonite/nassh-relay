@@ -40,6 +40,7 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
 
     @Override
     public void handle(final ServerWebSocket ws) {
+        ws.setWriteQueueMaxSize(Constants.QUEUEMAXSIZE);
         final MultiMap params = params(ws.uri());
         if (ws.path().equals("/connect") && params.contains("sid") && params.contains("ack") && params.contains("pos")) {
             final UUID sid = UUID.fromString(params.get("sid"));
@@ -70,12 +71,23 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
             }
             final Buffer buffer = queue.poll();
             if (buffer != null) {
-                final Buffer ackbuffer = new Buffer();
-                ackbuffer.setInt(0, session.getWrite_count());
-                ackbuffer.setBuffer(4, buffer);
-                ws.write(ackbuffer);
+                if (!ws.writeQueueFull()) {
+                    final Buffer ackbuffer = new Buffer();
+                    ackbuffer.setInt(0, session.getWrite_count());
+                    ackbuffer.setBuffer(4, buffer);
+                    ws.write(ackbuffer);
+                }else{
+                    ws.pause();
+                    queue.add(buffer);
+                }
             }
             LOG.debug("connected");
+            ws.drainHandler(new VoidHandler() {
+                @Override
+                public void handle() {
+                    ws.resume();
+                }
+            });
             ws.dataHandler(new Handler<Buffer>() {
                 @Override
                 public void handle(final Buffer data) {

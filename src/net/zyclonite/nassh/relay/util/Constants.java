@@ -17,6 +17,7 @@ import java.util.List;
  * @author zyclonite
  */
 public class Constants {
+    public final static int QUEUEMAXSIZE = 1000;
     public final static String SESSIONS = "map.sessions";
     public final static String SESSIONCOOKIE = "JSESSIONID";
     public final static List<String> ORIGINS = Arrays.asList("chrome-extension://okddffdblfhhnmhodogpojmfkjmhinfp", "chrome-extension://pnhechapfaindjhompbnflcldabbghjo");
