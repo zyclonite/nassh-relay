@@ -63,7 +63,7 @@ public class TransferQueue extends Observable implements Queue<Buffer> {
 
     @Override
     public Buffer peek() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return queue.peek();
     }
 
     @Override
@@ -98,7 +98,7 @@ public class TransferQueue extends Observable implements Queue<Buffer> {
 
     @Override
     public boolean remove(Object o) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return queue.remove(o);
     }
 
     @Override

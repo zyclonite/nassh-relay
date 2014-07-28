@@ -69,16 +69,16 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
             if (queue.countObservers() == 0) {
                 queue.addObserver(observer);
             }
-            final Buffer buffer = queue.poll();
+            final Buffer buffer = queue.peek();
             if (buffer != null) {
                 if (!ws.writeQueueFull()) {
                     final Buffer ackbuffer = new Buffer();
                     ackbuffer.setInt(0, session.getWrite_count());
                     ackbuffer.setBuffer(4, buffer);
                     ws.write(ackbuffer);
+                    queue.remove(buffer);
                 }else{
                     ws.pause();
-                    queue.add(buffer);
                 }
             }
             LOG.debug("connected");
