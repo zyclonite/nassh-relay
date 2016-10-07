@@ -57,7 +57,7 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
             final TransferQueue queue;
             try {
                 queue = QueueFactory.getQueue(sid.toString());
-            } catch (NoSuchQueueException ex) {
+            } catch (final NoSuchQueueException ex) {
                 logger.warn(ex, ex.fillInStackTrace());
                 ws.reject();
                 ws.close();

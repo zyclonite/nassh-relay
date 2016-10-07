@@ -94,12 +94,16 @@ public class ProxyHandler implements Handler<RoutingContext> {
                             if (!res.result()) {
                                 request.response().setStatusCode(410);
                                 request.response().end("host not allowed");
-                                logger.warn("client " + clienthost + " " + (authSession == null ? "" : "(" + authSession + ")") + "tried to access " + address.getHostAddress() + " but was not allowed");
+                                logger.warn("client " + clienthost + " " + (authSession == null ? "" : "(" + authSession + ")") + " tried to access " + address.getHostAddress() + " but was not allowed");
                             } else {
                                 request.response().setStatusCode(200);
                                 connectTcpEndpoint(sid, address.getHostAddress(), port, clienthost);
                                 request.response().end(sid.toString());
                             }
+                        } else {
+                            logger.error(res.cause().getMessage(), res.cause());
+                            request.response().setStatusCode(500);
+                            request.response().end("internal server error");
                         }
                     });
                 } else {
@@ -150,7 +154,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
                 sessions.put(sid.toString(), session);
                 registerTimerOut(session, client);
             } else {
-                logger.warn("Could not connect to ssh server: " + asyncResult.cause().getMessage(), asyncResult.cause().fillInStackTrace());
+                logger.warn("Could not connect to ssh server: " + asyncResult.cause().getMessage(), asyncResult.cause());
             }
         });
     }

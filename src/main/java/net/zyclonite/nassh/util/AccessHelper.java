@@ -27,19 +27,15 @@ public class AccessHelper {
     private static Logger logger = LoggerFactory.getLogger(AccessHelper.class);
 
     public static boolean isHostAllowed(final JsonArray accesslist, final JsonArray blacklist, final InetAddress address, final AuthSession authSession) {
-        if(isHostAllowed(blacklist, address)) {
-            return true;
-        }
         if (authSession != null) {
-            return accesslist.stream().map(l -> (JsonObject)l)
+            final boolean access = accesslist.stream().map(l -> (JsonObject)l)
                     .filter(item -> filterUser(item, authSession))
-                    .anyMatch(item -> checkAccess(item.getJsonArray("access"), address, false));
+                    .anyMatch(item -> checkAccess(item.getJsonArray("access"), address));
+            if(access) {
+                return true;
+            }
         }
-        return false;
-    }
-
-    public static boolean isHostAllowed(final JsonArray blacklist, final InetAddress address) {
-        return checkAccess(blacklist, address, true);
+        return checkBlock(blacklist, address);
     }
 
     private static boolean filterUser(final JsonObject listItem, final AuthSession authSession) {
@@ -58,38 +54,49 @@ public class AccessHelper {
         return false;
     }
 
-    private static boolean checkAccess(final JsonArray list, final InetAddress address, final boolean blacklist) {
+    private static boolean checkAccess(final JsonArray list, final InetAddress address) {
         return list.stream().map(l -> (JsonObject)l)
                 .anyMatch(entry -> {
                     if(entry.containsKey("network")) {
-                        return checkNetwork(entry.getString("network"), address, blacklist);
+                        return checkNetwork(entry.getString("network"), address);
                     } else {
-                        return checkHost(entry.getString("host"), address, blacklist);
+                        return checkHost(entry.getString("host"), address);
                     }
                 });
     }
 
-    private static boolean checkHost(final String block, final InetAddress address, final boolean blacklist) {
+    private static boolean checkBlock(final JsonArray list, final InetAddress address) {
+        return list.stream().map(l -> (JsonObject)l)
+                .noneMatch(entry -> {
+                    if(entry.containsKey("network")) {
+                        return checkNetwork(entry.getString("network"), address);
+                    } else {
+                        return checkHost(entry.getString("host"), address);
+                    }
+                });
+    }
+
+    private static boolean checkHost(final String block, final InetAddress address) {
         try {
             final InetAddress blk = InetAddress.getByName(block);
             if (address.getHostAddress().equals(blk.getHostAddress())) {
-                return !blacklist;
+                return true;
             }
         } catch (final UnknownHostException ex) {
             logger.warn("Configuration error at " + block + " " + ex);
         }
-        return blacklist;
+        return false;
     }
 
-    private static boolean checkNetwork(final String block, final InetAddress address, final boolean blacklist) {
+    private static boolean checkNetwork(final String block, final InetAddress address) {
         try {
             final NetworkHelper netblk = new NetworkHelper(block);
             if (netblk.isInRange(address)) {
-                return !blacklist;
+                return true;
             }
         } catch (final UnknownHostException ex) {
             logger.warn("Configuration error at " + block + " " + ex);
         }
-        return blacklist;
+        return false;
     }
 }
