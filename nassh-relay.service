@@ -1,0 +1,15 @@
+[Unit]
+Description=nassh-relay Service
+After=docker.service
+Requires=docker.service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+SuccessExitStatus=143
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill nassh-relay
+ExecStartPre=-/usr/bin/docker rm nassh-relay
+ExecStartPre=/usr/bin/docker pull zyclonite/nassh-relay:latest
+ExecStart=/usr/bin/docker run --name nassh-relay -p 8022:8022 zyclonite/nassh-relay:latest
+ExecStop=/usr/bin/docker stop nassh-relay

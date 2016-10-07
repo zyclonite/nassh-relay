@@ -1,0 +1,35 @@
+{
+  "webservice":{
+    "hostname":"0.0.0.0",
+    "port":8022
+  },
+  "application":{
+    "authentication":false,
+    "max-sessions":100,
+    "tcp-session-timeout":1200,
+    "auth-session-timeout":600
+  },
+  "accesslist":[{
+    "id":"108934471500486501035",
+    "access":[
+        {"network":"192.168.0.0/16"},
+        {"host":"127.0.0.1"}
+      ]
+    }
+  ],
+  "blacklist":[
+    {"network":"192.168.0.0/16"},
+    {"network":"169.254.0.0/16"},
+    {"network":"172.16.0.0/12"},
+    {"network":"127.0.0.0/8"},
+    {"network":"10.0.0.0/8"},
+    {"network":"0.0.0.0/8"},
+    {"network":"fe80::/10"},
+    {"host":"127.0.0.1"}
+  ],
+  "google-sso":{
+    "title":"nassh-relay g+ Single Sign On",
+    "client-id":"",
+    "client-secret":""
+  }
+}

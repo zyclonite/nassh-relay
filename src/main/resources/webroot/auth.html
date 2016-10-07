@@ -1,0 +1,98 @@
+<html>
+<head>
+    <title>{{ APPLICATION_NAME }}</title>
+    <style>
+            body {
+                background-color: black;
+                position: absolute;
+                padding: 0;
+                margin: 60px 0 0 0;
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+                font-family: 'DejaVu Sans Mono', 'Everson Mono', FreeMono, Menlo, Terminal, monospace;
+                font-size: 15px;
+                -webkit-font-smoothing: antialiased;
+                color: rgb(240, 240, 240);
+            }
+            a {
+                color: rgb(240, 240, 240);
+                text-decoration: none;
+            }
+        </style>
+    <script type="text/javascript">
+            (function() {
+                var po = document.createElement('script');
+                po.type = 'text/javascript';
+                po.async = true;
+                po.src = 'https://plus.google.com/js/client:plusone.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(po, s);
+            })();
+        </script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js" ></script>
+</head>
+<body>
+<center>
+    <div id="gConnect">
+        <h1>Sign in with your g+ account</h1>
+        <button class="g-signin"
+                data-scope="profile"
+                data-clientId="{{ CLIENT_ID }}"
+                data-accesstype="offline"
+                data-callback="onSignInCallback"
+                data-theme="dark"
+                data-cookiepolicy="single_host_origin">
+        </button>
+    </div>
+    <div id="authOps" style="display:none">
+        <h1>You are signed in with your g+ account</h1>
+    </div>
+    <div id="authErr" style="display:none">
+        <h1>Authentication Error</h1>
+        <pre id="authResult"></pre>
+    </div>
+</center>
+<script type="text/javascript">
+            var helper = (function() {
+                var authResult = undefined;
+                return {
+                    onSignInCallback: function(authResult) {
+                        $('#authResult').html("");
+                        if (authResult['access_token']) {
+                            this.authResult = authResult;
+                            helper.connectServer();
+                            $('#authOps').show('slow');
+                            $('#authErr').hide();
+                            $('#gConnect').hide();
+                        } else if (authResult['error']) {
+                            if(authResult['error'] === "access_denied") {
+                                console.log('There was an error: ' + authResult['error']);
+                                $('#authErr').show();
+                                $('#authResult').html("Access Denied");
+                            }
+                            $('#authOps').hide();
+                            $('#authErr').hide();
+                            $('#gConnect').show();
+                        }
+                    },
+                    connectServer: function() {
+                        $.ajax({
+                            type: 'POST',
+                            url: 'cookie?state={{ STATE }}',
+                            contentType: 'application/octet-stream; charset=utf-8',
+                            success: function(result) {
+                                window.location.reload(false);
+                            },
+                            processData: false,
+                            data: this.authResult.code
+                        });
+                    }
+                };
+            })();
+            function onSignInCallback(authResult) {
+                helper.onSignInCallback(authResult);
+            }
+    </script>
+</body>
+</html>
