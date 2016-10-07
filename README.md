@@ -6,6 +6,12 @@ Relay Server for the Secure Shell Chromium plugin
 
 See https://github.com/zyclonite/nassh-relay/wiki/Manual for details
 
+## Docker
+
+```
+$ docker run -d --name nassh-relay -p 8022:8022 zyclonite/nassh-relay
+```
+
 ## Demo
 
 To see nassh-relay in action go to: https://relay.wsn.at
