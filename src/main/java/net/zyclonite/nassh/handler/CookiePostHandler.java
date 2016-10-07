@@ -88,10 +88,14 @@ public class CookiePostHandler implements Handler<RoutingContext> {
 
                 final GoogleIdToken idToken = tokenResponse.parseIdToken();
                 final String gplusid = idToken.getPayload().getSubject();
+                final String email = idToken.getPayload().getEmail();
+                final String hostedDomain = idToken.getPayload().getHostedDomain();
 
-                logger.info("Google Plus user: " + gplusid + " logged in");
+                logger.info("Google Plus user: id: " + gplusid + " email: "+email+" domain: "+hostedDomain+" logged in");
                 session.put("token", tokenResponse.toString());
-                session.put("gplusid", gplusid);
+                session.put("id", gplusid);
+                session.put("email", email);
+                session.put("domain", hostedDomain);
                 request.response().setStatusCode(200);
                 request.response().end("\"Successfully connected user.\"");
             } catch (TokenResponseException e) {

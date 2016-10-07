@@ -58,8 +58,9 @@ public class CookieHandler implements Handler<RoutingContext> {
                 request.response().end();
                 return;
             }
-            final String gplusid = WebHelper.validateCookie(context);
-            if (gplusid != null) {
+            final AuthSession authSession = WebHelper.validateCookie(context);
+            if (authSession != null) {
+                final String gplusid = authSession.get("id");
                 request.response().putHeader("location", "chrome-extension://" + ext + "/" + path + "#" + gplusid + "@" + request.host());
                 request.response().setStatusCode(302);
                 request.response().end();

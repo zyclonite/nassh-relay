@@ -21,6 +21,7 @@ import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.shareddata.LocalMap;
 import io.vertx.ext.web.RoutingContext;
+import net.zyclonite.nassh.model.AuthSession;
 import net.zyclonite.nassh.model.Session;
 import net.zyclonite.nassh.util.*;
 
@@ -57,16 +58,16 @@ public class ProxyHandler implements Handler<RoutingContext> {
         request.response().putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
         request.response().putHeader("Pragma", "no-cache");
         if (request.params().contains("host") && request.params().contains("port")) {
-            String gplusid = null;
+            AuthSession authPreSession = null;
             if (authentication) {
-                gplusid = WebHelper.validateCookie(context);
-                if (gplusid == null) {
+                authPreSession = WebHelper.validateCookie(context);
+                if (authPreSession == null) {
                     request.response().setStatusCode(410);
                     request.response().end("session invalid");
                     return;
                 }
             }
-            final String googleid = gplusid;
+            final AuthSession authSession = authPreSession;
             final String host = request.params().get("host");
             final int port = Integer.parseInt(request.params().get("port"));
             final UUID sid = UUID.randomUUID();
@@ -86,14 +87,14 @@ public class ProxyHandler implements Handler<RoutingContext> {
                 if(result.succeeded()) {
                     final InetAddress address = result.result();
                     vertx.<Boolean>executeBlocking(future -> {
-                        final boolean isAllowed = AccessHelper.isHostAllowed(config.getJsonArray("accesslist"), config.getJsonArray("blacklist"), address, googleid);
+                        final boolean isAllowed = AccessHelper.isHostAllowed(config.getJsonArray("accesslist"), config.getJsonArray("blacklist"), address, authSession);
                         future.complete(isAllowed);
                     }, false, res -> {
                         if(res.succeeded()) {
                             if (!res.result()) {
                                 request.response().setStatusCode(410);
                                 request.response().end("host not allowed");
-                                logger.warn("client " + clienthost + " " + (googleid == null ? "" : "(" + googleid + ")") + "tried to access " + address.getHostAddress() + " but was not allowed");
+                                logger.warn("client " + clienthost + " " + (authSession == null ? "" : "(" + authSession + ")") + "tried to access " + address.getHostAddress() + " but was not allowed");
                             } else {
                                 request.response().setStatusCode(200);
                                 connectTcpEndpoint(sid, address.getHostAddress(), port, clienthost);

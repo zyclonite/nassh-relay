@@ -22,7 +22,7 @@ import java.util.UUID;
  */
 public class WebHelper {
 
-    public static String validateCookie(final RoutingContext context) {
+    public static AuthSession validateCookie(final RoutingContext context) {
         final Cookie cookie = context.getCookie(Constants.SESSIONCOOKIE);
         if(cookie == null) {
             return null;
@@ -32,9 +32,9 @@ public class WebHelper {
         if (session == null) {
             return null;
         }
-        final String gplusid = session.get("gplusid");
-        if (gplusid != null) {
-            return gplusid;
+        final String id = session.get("id");
+        if (id != null) {
+            return session;
         }
         return null;
     }

@@ -54,4 +54,15 @@ public class AuthSession {
     public void refresh() {
         lastAccessed = new Date().getTime();
     }
+
+    @Override
+    public String toString() {
+
+        return "AuthSession{" +
+                "uuid='" + id + '\'' +
+                ", id='" + get("id") + '\'' +
+                ", email='" + get("email") + '\'' +
+                ", domain='" + get("domain") + '\'' +
+                '}';
+    }
 }
