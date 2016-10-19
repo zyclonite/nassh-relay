@@ -26,7 +26,7 @@ public class AccessHelper {
 
     private static Logger logger = LoggerFactory.getLogger(AccessHelper.class);
 
-    public static boolean isHostAllowed(final JsonArray accesslist, final JsonArray blacklist, final InetAddress address, final AuthSession authSession) {
+    public static boolean isHostAllowed(final JsonArray accesslist, final JsonArray whitelist, final JsonArray blacklist, final InetAddress address, final AuthSession authSession) {
         if (authSession != null) {
             final boolean access = accesslist.stream().map(l -> (JsonObject)l)
                     .filter(item -> filterUser(item, authSession))
@@ -34,6 +34,9 @@ public class AccessHelper {
             if(access) {
                 return true;
             }
+        }
+        if(checkAccess(whitelist, address)) {
+            return true;
         }
         return checkBlock(blacklist, address);
     }

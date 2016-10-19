@@ -87,7 +87,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
                 if(result.succeeded()) {
                     final InetAddress address = result.result();
                     vertx.<Boolean>executeBlocking(future -> {
-                        final boolean isAllowed = AccessHelper.isHostAllowed(config.getJsonArray("accesslist"), config.getJsonArray("blacklist"), address, authSession);
+                        final boolean isAllowed = AccessHelper.isHostAllowed(config.getJsonArray("accesslist"), config.getJsonArray("whitelist"), config.getJsonArray("blacklist"), address, authSession);
                         future.complete(isAllowed);
                     }, false, res -> {
                         if(res.succeeded()) {
