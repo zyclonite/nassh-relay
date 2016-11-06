@@ -18,6 +18,7 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import net.zyclonite.nassh.handler.*;
 
+@SuppressWarnings("unused")
 public class MainVerticle extends AbstractVerticle {
     private static Logger logger = LoggerFactory.getLogger(MainVerticle.class);
     private HttpServer server;
