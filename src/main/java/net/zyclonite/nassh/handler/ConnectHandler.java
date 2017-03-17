@@ -13,7 +13,6 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
-import io.vertx.core.VoidHandler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.logging.Logger;
@@ -27,7 +26,6 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- *
  * @author zyclonite
  */
 public class ConnectHandler implements Handler<ServerWebSocket> {
@@ -47,7 +45,7 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
             final UUID sid = UUID.fromString(params.get("sid"));
             final LocalMap<String, Session> map = vertx.sharedData().getLocalMap(Constants.SESSIONS);
             final Session session = map.get(sid.toString());
-            if(session == null || !session.isActive()){
+            if (session == null || !session.isActive()) {
                 ws.reject();
                 return;
             }
@@ -74,19 +72,14 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
                     ackbuffer.setBuffer(4, buffer);
                     ws.write(ackbuffer);
                     queue.remove(buffer);
-                }else{
+                } else {
                     ws.pause();
                 }
             }
             logger.debug("connected");
-            ws.drainHandler(new VoidHandler() {
-                @Override
-                public void handle() {
-                    ws.resume();
-                }
-            });
+            ws.drainHandler(v -> ws.resume());
             ws.handler(data -> {
-                if(!session.isActive()) {
+                if (!session.isActive()) {
                     ws.close();
                     return;
                 }
@@ -94,15 +87,12 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
                     logger.warn("wrong frame format");
                     return;
                 }
-                session.setWrite_count(session.getWrite_count() + data.length()-4);
+                session.setWrite_count(session.getWrite_count() + data.length() - 4);
                 vertx.eventBus().publish(session.getHandler(), data.getBuffer(4, data.length()));
             });
-            ws.closeHandler(new VoidHandler() {
-                @Override
-                protected void handle() {
-                    queue.deleteObservers();
-                    logger.debug("disconnected");
-                }
+            ws.closeHandler(v -> {
+                queue.deleteObservers();
+                logger.debug("disconnected");
             });
         } else {
             ws.reject();

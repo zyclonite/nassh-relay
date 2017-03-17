@@ -11,7 +11,6 @@ package net.zyclonite.nassh.handler;
 
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.VoidHandler;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.impl.VertxImpl;
 import io.vertx.core.json.JsonObject;
@@ -29,7 +28,6 @@ import java.net.InetAddress;
 import java.util.UUID;
 
 /**
- *
  * @author zyclonite
  */
 public class ProxyHandler implements Handler<RoutingContext> {
@@ -83,14 +81,14 @@ public class ProxyHandler implements Handler<RoutingContext> {
                 logger.warn("ssh session limit of " + sessionlimit + " reached");
                 return;
             }
-            ((VertxImpl)vertx).resolveAddress(host, result -> {
-                if(result.succeeded()) {
+            ((VertxImpl) vertx).resolveAddress(host, result -> {
+                if (result.succeeded()) {
                     final InetAddress address = result.result();
                     vertx.<Boolean>executeBlocking(future -> {
                         final boolean isAllowed = AccessHelper.isHostAllowed(config.getJsonArray("accesslist"), config.getJsonArray("whitelist"), config.getJsonArray("blacklist"), address, authSession);
                         future.complete(isAllowed);
                     }, false, res -> {
-                        if(res.succeeded()) {
+                        if (res.succeeded()) {
                             if (!res.result()) {
                                 request.response().setStatusCode(410);
                                 request.response().end("host not allowed");
@@ -123,31 +121,23 @@ public class ProxyHandler implements Handler<RoutingContext> {
             if (asyncResult.succeeded()) {
                 logger.info("Connected to ssh server: " + host + ":" + port + " (" + clienthost + ")");
                 QueueFactory.createQueue(sid.toString());
-                asyncResult.result().drainHandler(new VoidHandler() {
-                    @Override
-                    public void handle() {
-                        asyncResult.result().resume();
-                    }
-                });
+                asyncResult.result().drainHandler(v -> asyncResult.result().resume());
                 asyncResult.result().handler(buffer -> {
                     try {
                         final TransferQueue queue = QueueFactory.getQueue(sid.toString());
-                        if(!queue.isFull()) {
+                        if (!queue.isFull()) {
                             queue.add(buffer);
-                        }else{
+                        } else {
                             asyncResult.result().pause();
                         }
                     } catch (NoSuchQueueException ex) {
                         logger.warn(ex, ex.fillInStackTrace());
                     }
                 });
-                asyncResult.result().closeHandler(new VoidHandler() {
-                    @Override
-                    public void handle() {
-                        logger.info("ssh server connection closed " + host + ":" + port);
-                        QueueFactory.deleteQueue(sid.toString());
-                        sessions.remove(sid.toString());
-                    }
+                asyncResult.result().closeHandler(v -> {
+                    logger.info("ssh server connection closed " + host + ":" + port);
+                    QueueFactory.deleteQueue(sid.toString());
+                    sessions.remove(sid.toString());
                 });
                 final Session session = new Session();
                 session.setHandler(asyncResult.result().writeHandlerID());
@@ -160,14 +150,15 @@ public class ProxyHandler implements Handler<RoutingContext> {
     }
 
     private void registerTimerOut(final Session session, final NetClient client) {
-        vertx.setPeriodic(config.getJsonObject("application").getInteger("tcp-session-timeout", 1200)*1000, new Handler<Long>() {
+        vertx.setPeriodic(config.getJsonObject("application").getInteger("tcp-session-timeout", 1200) * 1000, new Handler<Long>() {
             private int readCount = 0;
             private int writeCount = 0;
+
             @Override
             public void handle(Long timerID) {
-                if((session.getRead_count() <= readCount) && (session.getWrite_count() <= writeCount)) {
+                if ((session.getRead_count() <= readCount) && (session.getWrite_count() <= writeCount)) {
                     session.setActive(false);
-                    if(client != null) {
+                    if (client != null) {
                         client.close();
                     }
                     vertx.cancelTimer(timerID);

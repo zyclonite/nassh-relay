@@ -4,7 +4,7 @@
 
   <groupId>net.zyclonite.nassh</groupId>
   <artifactId>nassh-relay</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
 
   <organization>
       <name>zyclonite networx</name>
@@ -18,14 +18,8 @@
       </developer>
   </developers>
 
-  <scm>
-      <connection>scm:git:https://github.com/zyclonite/nassh-relay.git</connection>
-      <developerConnection>scm:git:[fetch=]https://github.com/zyclonite/nassh-relay.git[push=]ssh://git@github.com:zyclonite/nassh-relay.git</developerConnection>
-      <url>https://github.com/zyclonite/nassh-relay</url>
-  </scm>
-
   <properties>
-      <vertx.version>3.3.3</vertx.version>
+      <vertx.version>3.4.1</vertx.version>
       <googleapi.version>1.22.0</googleapi.version>
       <vertx.main>${project.groupId}.MainVerticle</vertx.main>
       <docker.group.name>zyclonite</docker.group.name>
@@ -78,7 +72,7 @@
       <dependency>
           <groupId>ch.qos.logback</groupId>
           <artifactId>logback-classic</artifactId>
-          <version>1.1.7</version>
+          <version>1.2.1</version>
       </dependency>
       <dependency>
           <groupId>junit</groupId>
@@ -141,7 +135,7 @@
               <plugin>
                   <groupId>io.fabric8</groupId>
                   <artifactId>docker-maven-plugin</artifactId>
-                  <version>0.15.16</version>
+                  <version>0.20.0</version>
                   <configuration>
                       <images>
                           <image>
