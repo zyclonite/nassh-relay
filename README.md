@@ -14,7 +14,12 @@ $ docker run -d --name nassh-relay -p 8022:8022 zyclonite/nassh-relay
 
 ## Demo
 
-To see nassh-relay in action go to: https://relay.wsn.at
+[![PlayWithDocker](https://github.com/play-with-docker/stacks/raw/cff22438cb4195ace27f9b15784bbb497047afa7/assets/images/button.png)](http://play-with-docker.com?stack=https://raw.githubusercontent.com/docker-library/docs/96c08fac215f64844b9db61038a571b86534a12b/elasticsearch/stack.yml)
+
+client options (fill in your temp docker url from pwd)
+```
+--proxy-host=pwd10-XXX-XXX-XXX-8022.host1.labs.play-with-docker.com --proxy-port=80
+```
 
 ## Source
 
