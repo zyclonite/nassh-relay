@@ -1,6 +1,6 @@
 /*
  * nassh-relay - Relay Server for tunneling ssh through a http endpoint
- * 
+ *
  * Website: https://github.com/zyclonite/nassh-relay
  *
  * Copyright 2014-2016   zyclonite    networx
@@ -47,6 +47,7 @@ public class ReadHandler implements Handler<RoutingContext> {
             final LocalMap<String, Session> map = vertx.sharedData().getLocalMap(Constants.SESSIONS);
             final Session session = map.get(sid.toString());
             if (session == null) {
+                logger.warn("could not find valid session for "+sid);
                 request.response().setStatusCode(410);
                 request.response().end();
                 return;

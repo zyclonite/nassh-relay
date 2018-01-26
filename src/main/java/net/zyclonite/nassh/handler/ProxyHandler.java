@@ -1,6 +1,6 @@
 /*
  * nassh-relay - Relay Server for tunneling ssh through a http endpoint
- * 
+ *
  * Website: https://github.com/zyclonite/nassh-relay
  *
  * Copyright 2014-2016   zyclonite    networx
@@ -9,6 +9,8 @@
  */
 package net.zyclonite.nassh.handler;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
@@ -94,9 +96,15 @@ public class ProxyHandler implements Handler<RoutingContext> {
                                 request.response().end("host not allowed");
                                 logger.warn("client " + clienthost + " " + (authSession == null ? "" : "(" + authSession + ")") + " tried to access " + address.getHostAddress() + " but was not allowed");
                             } else {
-                                request.response().setStatusCode(200);
-                                connectTcpEndpoint(sid, address.getHostAddress(), port, clienthost);
-                                request.response().end(sid.toString());
+                                connectTcpEndpoint(sid, address.getHostAddress(), port, clienthost).setHandler(ar -> {
+                                    if(ar.succeeded()) {
+                                        request.response().setStatusCode(200);
+                                        request.response().end(sid.toString());
+                                    } else {
+                                        request.response().setStatusCode(500);
+                                        request.response().end("could not init ssh session");
+                                    }
+                                });
                             }
                         } else {
                             logger.error(res.cause().getMessage(), res.cause());
@@ -115,7 +123,8 @@ public class ProxyHandler implements Handler<RoutingContext> {
         }
     }
 
-    private void connectTcpEndpoint(final UUID sid, final String host, final int port, final String clienthost) {
+    private Future<UUID> connectTcpEndpoint(final UUID sid, final String host, final int port, final String clienthost) {
+        final Future<UUID> future = Future.future();
         final NetClient client = vertx.createNetClient(new NetClientOptions().setReconnectAttempts(10).setReconnectInterval(500));
         client.connect(port, host, asyncResult -> {
             if (asyncResult.succeeded()) {
@@ -143,10 +152,13 @@ public class ProxyHandler implements Handler<RoutingContext> {
                 session.setHandler(asyncResult.result().writeHandlerID());
                 sessions.put(sid.toString(), session);
                 registerTimerOut(session, client);
+                future.complete(sid);
             } else {
+                future.fail(asyncResult.cause());
                 logger.warn("Could not connect to ssh server: " + asyncResult.cause().getMessage(), asyncResult.cause());
             }
         });
+        return future;
     }
 
     private void registerTimerOut(final Session session, final NetClient client) {
