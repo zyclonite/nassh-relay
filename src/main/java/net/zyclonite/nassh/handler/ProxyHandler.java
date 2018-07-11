@@ -3,13 +3,12 @@
  *
  * Website: https://github.com/zyclonite/nassh-relay
  *
- * Copyright 2014-2016   zyclonite    networx
+ * Copyright 2014-2018   zyclonite    networx
  *                       http://zyclonite.net
  * Developer: Lukas Prettenthaler
  */
 package net.zyclonite.nassh.handler;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -97,7 +96,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
                                 logger.warn("client " + clienthost + " " + (authSession == null ? "" : "(" + authSession + ")") + " tried to access " + address.getHostAddress() + " but was not allowed");
                             } else {
                                 connectTcpEndpoint(sid, address.getHostAddress(), port, clienthost).setHandler(ar -> {
-                                    if(ar.succeeded()) {
+                                    if (ar.succeeded()) {
                                         request.response().setStatusCode(200);
                                         request.response().end(sid.toString());
                                     } else {

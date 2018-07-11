@@ -1,9 +1,9 @@
 /*
  * nassh-relay - Relay Server for tunneling ssh through a http endpoint
- * 
+ *
  * Website: https://github.com/zyclonite/nassh-relay
  *
- * Copyright 2014-2016   zyclonite    networx
+ * Copyright 2014-2018   zyclonite    networx
  *                       http://zyclonite.net
  * Developer: Lukas Prettenthaler
  */
@@ -18,7 +18,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- *
  * @author zyclonite
  */
 public class TransferQueue extends Observable implements Queue<Buffer> {
@@ -41,10 +40,7 @@ public class TransferQueue extends Observable implements Queue<Buffer> {
     }
 
     public boolean isFull() {
-        if(queue.size() >= Constants.QUEUEMAXSIZE) {
-            return true;
-        }
-        return false;
+        return queue.size() >= Constants.QUEUEMAXSIZE;
     }
 
     @Override

@@ -3,7 +3,7 @@
  *
  * Website: https://github.com/zyclonite/nassh-relay
  *
- * Copyright 2014-2016   zyclonite    networx
+ * Copyright 2014-2018   zyclonite    networx
  *                       http://zyclonite.net
  * Developer: Lukas Prettenthaler
  */
@@ -37,21 +37,21 @@ public class MainVerticle extends AbstractVerticle {
         server.requestHandler(router::accept);
         server.websocketHandler(new ConnectHandler(vertx));
         server.listen(config.getInteger("port", 8022), config.getString("hostname", "localhost"),
-                result -> {
-                    if (result.succeeded()) {
-                        logger.info("nassh-relay listening on port "+result.result().actualPort());
-                        startFuture.complete();
-                    } else {
-                        startFuture.fail(result.cause());
-                    }
+            result -> {
+                if (result.succeeded()) {
+                    logger.info("nassh-relay listening on port " + result.result().actualPort());
+                    startFuture.complete();
+                } else {
+                    startFuture.fail(result.cause());
                 }
+            }
         );
     }
 
     @Override
     public void stop(final Future<Void> stopFuture) throws Exception {
         logger.debug("stopped");
-        if(server != null) {
+        if (server != null) {
             server.close(complete -> stopFuture.complete());
         } else {
             stopFuture.complete();

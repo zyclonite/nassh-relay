@@ -1,9 +1,9 @@
 /*
  * nassh-relay - Relay Server for tunneling ssh through a http endpoint
- * 
+ *
  * Website: https://github.com/zyclonite/nassh-relay
  *
- * Copyright 2014-2016   zyclonite    networx
+ * Copyright 2014-2018   zyclonite    networx
  *                       http://zyclonite.net
  * Developer: Lukas Prettenthaler
  */
@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- *
  * @author zyclonite
  */
 public class Constants {

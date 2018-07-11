@@ -1,9 +1,9 @@
 /*
  * nassh-relay - Relay Server for tunneling ssh through a http endpoint
- * 
+ *
  * Website: https://github.com/zyclonite/nassh-relay
  *
- * Copyright 2014-2016   zyclonite    networx
+ * Copyright 2014-2018   zyclonite    networx
  *                       http://zyclonite.net
  * Developer: Lukas Prettenthaler
  */
@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- *
  * @author zyclonite
  */
 public class AuthSession {
@@ -36,11 +35,7 @@ public class AuthSession {
     }
 
     public String get(final String key) {
-        if (keyvalues.containsKey(key)) {
-            return keyvalues.get(key);
-        } else {
-            return null;
-        }
+        return keyvalues.getOrDefault(key, null);
     }
 
     public void put(final String key, final String value) {
@@ -59,10 +54,10 @@ public class AuthSession {
     public String toString() {
 
         return "AuthSession{" +
-                "uuid='" + id + '\'' +
-                ", id='" + get("id") + '\'' +
-                ", email='" + get("email") + '\'' +
-                ", domain='" + get("domain") + '\'' +
-                '}';
+            "uuid='" + id + '\'' +
+            ", id='" + get("id") + '\'' +
+            ", email='" + get("email") + '\'' +
+            ", domain='" + get("domain") + '\'' +
+            '}';
     }
 }

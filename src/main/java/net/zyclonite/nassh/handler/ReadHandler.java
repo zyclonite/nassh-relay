@@ -3,7 +3,7 @@
  *
  * Website: https://github.com/zyclonite/nassh-relay
  *
- * Copyright 2014-2016   zyclonite    networx
+ * Copyright 2014-2018   zyclonite    networx
  *                       http://zyclonite.net
  * Developer: Lukas Prettenthaler
  */
@@ -24,7 +24,6 @@ import org.apache.commons.codec.binary.Base64;
 import java.util.UUID;
 
 /**
- *
  * @author zyclonite
  */
 public class ReadHandler implements Handler<RoutingContext> {
@@ -47,7 +46,7 @@ public class ReadHandler implements Handler<RoutingContext> {
             final LocalMap<String, Session> map = vertx.sharedData().getLocalMap(Constants.SESSIONS);
             final Session session = map.get(sid.toString());
             if (session == null) {
-                logger.warn("could not find valid session for "+sid);
+                logger.warn("could not find valid session for " + sid);
                 request.response().setStatusCode(410);
                 request.response().end();
                 return;

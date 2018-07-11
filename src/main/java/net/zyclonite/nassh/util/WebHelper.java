@@ -1,9 +1,9 @@
 /*
  * nassh-relay - Relay Server for tunneling ssh through a http endpoint
- * 
+ *
  * Website: https://github.com/zyclonite/nassh-relay
  *
- * Copyright 2014-2016   zyclonite    networx
+ * Copyright 2014-2018   zyclonite    networx
  *                       http://zyclonite.net
  * Developer: Lukas Prettenthaler
  */
@@ -17,14 +17,13 @@ import net.zyclonite.nassh.model.AuthSession;
 import java.util.UUID;
 
 /**
- *
  * @author zyclonite
  */
 public class WebHelper {
 
     public static AuthSession validateCookie(final RoutingContext context) {
         final Cookie cookie = context.getCookie(Constants.SESSIONCOOKIE);
-        if(cookie == null) {
+        if (cookie == null) {
             return null;
         }
         final UUID sessioncookie = UUID.fromString(cookie.getValue());

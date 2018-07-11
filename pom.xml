@@ -19,7 +19,7 @@
   </developers>
 
   <properties>
-      <vertx.version>3.5.0</vertx.version>
+      <vertx.version>3.5.2</vertx.version>
       <googleapi.version>1.23.0</googleapi.version>
       <vertx.main>${project.groupId}.MainVerticle</vertx.main>
       <docker.group.name>zyclonite</docker.group.name>
@@ -91,7 +91,7 @@
       <plugins>
           <plugin>
               <artifactId>maven-compiler-plugin</artifactId>
-              <version>3.5.1</version>
+              <version>3.7.0</version>
               <configuration>
                   <source>1.8</source>
                   <target>1.8</target>
@@ -110,7 +110,7 @@
               <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-shade-plugin</artifactId>
-                  <version>2.4.3</version>
+                  <version>3.1.0</version>
                   <executions>
                       <execution>
                           <phase>package</phase>
@@ -135,30 +135,24 @@
               <plugin>
                   <groupId>io.fabric8</groupId>
                   <artifactId>docker-maven-plugin</artifactId>
-                  <version>0.22.1</version>
+                  <version>0.25.2</version>
                   <configuration>
                       <images>
                           <image>
                               <name>${docker.image}</name>
                               <build>
-                                  <from>java:8-alpine</from>
+                                  <from>openjdk:10-jre-slim</from>
+                                  <user>nobody</user>
                                   <tags>
                                       <tag>latest</tag>
                                       <tag>${project.version}</tag>
                                   </tags>
                                   <workdir>/opt</workdir>
+                                  <env>
+                                      <JAVA_LOG_LEVEL>INFO</JAVA_LOG_LEVEL>
+                                  </env>
                                   <entryPoint>
-                                      <exec>
-                                          <arg>java</arg>
-                                          <arg>-Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.SLF4JLogDelegateFactory</arg>
-                                          <arg>-Droot.level=INFO</arg>
-                                          <arg>-jar</arg>
-                                          <arg>${project.artifactId}-${project.version}-fat.jar</arg>
-                                          <arg>-conf</arg>
-                                          <arg>config.json</arg>
-                                          <arg>-cp</arg>
-                                          <arg>.</arg>
-                                      </exec>
+                                      <shell>exec java -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.SLF4JLogDelegateFactory -Droot.level=${JAVA_LOG_LEVEL} --illegal-access=deny -jar ${project.artifactId}-${project.version}-fat.jar -conf config.json -cp .</shell>
                                   </entryPoint>
                                   <runCmds>
                                       <runcmd>chmod -R 777 /opt</runcmd>

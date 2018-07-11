@@ -1,9 +1,9 @@
 /*
  * nassh-relay - Relay Server for tunneling ssh through a http endpoint
- * 
+ *
  * Website: https://github.com/zyclonite/nassh-relay
  *
- * Copyright 2014-2016   zyclonite    networx
+ * Copyright 2014-2018   zyclonite    networx
  *                       http://zyclonite.net
  * Developer: Lukas Prettenthaler
  */
@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.util.UUID;
 
 /**
- *
  * @author zyclonite
  */
 public class CookiePostHandler implements Handler<RoutingContext> {
@@ -58,7 +57,7 @@ public class CookiePostHandler implements Handler<RoutingContext> {
         request.response().putHeader("Content-Type", "application/json");
         final Cookie cookie = context.getCookie(Constants.SESSIONCOOKIE);
         UUID sessioncookie;
-        if(cookie == null) {
+        if (cookie == null) {
             sessioncookie = null;
         } else {
             sessioncookie = UUID.fromString(cookie.getValue());
@@ -84,14 +83,14 @@ public class CookiePostHandler implements Handler<RoutingContext> {
         request.bodyHandler(body -> {
             try {
                 final GoogleTokenResponse tokenResponse = new GoogleAuthorizationCodeTokenRequest(httpTransport, jsonFactory,
-                        auth.getString("client-id"), auth.getString("client-secret"), body.toString(), "postmessage").execute();
+                    auth.getString("client-id"), auth.getString("client-secret"), body.toString(), "postmessage").execute();
 
                 final GoogleIdToken idToken = tokenResponse.parseIdToken();
                 final String gplusid = idToken.getPayload().getSubject();
                 final String email = idToken.getPayload().getEmail();
                 final String hostedDomain = idToken.getPayload().getHostedDomain();
 
-                logger.info("Google Plus user: id: " + gplusid + " email: "+email+" domain: "+hostedDomain+" logged in");
+                logger.info("Google Plus user: id: " + gplusid + " email: " + email + " domain: " + hostedDomain + " logged in");
                 session.put("token", tokenResponse.toString());
                 session.put("id", gplusid);
                 session.put("email", email);
@@ -104,7 +103,7 @@ public class CookiePostHandler implements Handler<RoutingContext> {
             } catch (IOException e) {
                 request.response().setStatusCode(500);
                 request.response().end("\"Failed to read token data from Google. "
-                        + e.getMessage()+"\"");
+                    + e.getMessage() + "\"");
             }
         });
     }

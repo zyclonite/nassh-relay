@@ -1,9 +1,9 @@
 /*
  * nassh-relay - Relay Server for tunneling ssh through a http endpoint
- * 
+ *
  * Website: https://github.com/zyclonite/nassh-relay
  *
- * Copyright 2014-2016   zyclonite    networx
+ * Copyright 2014-2018   zyclonite    networx
  *                       http://zyclonite.net
  * Developer: Lukas Prettenthaler
  */
@@ -26,7 +26,6 @@ import java.security.SecureRandom;
 import java.util.Scanner;
 
 /**
- *
  * @author zyclonite
  */
 public class CookieHandler implements Handler<RoutingContext> {
@@ -52,7 +51,7 @@ public class CookieHandler implements Handler<RoutingContext> {
         if (request.params().contains("ext") && request.params().contains("path")) {
             final String ext = request.params().get("ext");
             final String path = request.params().get("path");
-            if(!authentication){
+            if (!authentication) {
                 request.response().putHeader("location", "chrome-extension://" + ext + "/" + path + "#anonymous@" + request.host());
                 request.response().setStatusCode(302);
                 request.response().end();
@@ -71,10 +70,10 @@ public class CookieHandler implements Handler<RoutingContext> {
                 session.put("state", state);
                 request.response().putHeader("Set-Cookie", ServerCookieEncoder.LAX.encode(Constants.SESSIONCOOKIE, session.getId().toString()));
                 final String auth_html = new Scanner(this.getClass().getResourceAsStream(STATIC_FILE), "UTF-8")
-                        .useDelimiter("\\A").next()
-                        .replaceAll("[{]{2}\\s*CLIENT_ID\\s*[}]{2}", auth.getString("client-id"))
-                        .replaceAll("[{]{2}\\s*STATE\\s*[}]{2}", state)
-                        .replaceAll("[{]{2}\\s*APPLICATION_NAME\\s*[}]{2}", auth.getString("title"));
+                    .useDelimiter("\\A").next()
+                    .replaceAll("[{]{2}\\s*CLIENT_ID\\s*[}]{2}", auth.getString("client-id"))
+                    .replaceAll("[{]{2}\\s*STATE\\s*[}]{2}", state)
+                    .replaceAll("[{]{2}\\s*APPLICATION_NAME\\s*[}]{2}", auth.getString("title"));
                 request.response().end(auth_html);
             }
         } else {

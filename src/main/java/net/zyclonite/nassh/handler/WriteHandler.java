@@ -1,9 +1,9 @@
 /*
  * nassh-relay - Relay Server for tunneling ssh through a http endpoint
- * 
+ *
  * Website: https://github.com/zyclonite/nassh-relay
  *
- * Copyright 2014-2016   zyclonite    networx
+ * Copyright 2014-2018   zyclonite    networx
  *                       http://zyclonite.net
  * Developer: Lukas Prettenthaler
  */
@@ -25,7 +25,6 @@ import org.apache.commons.codec.binary.Base64;
 import java.util.UUID;
 
 /**
- *
  * @author zyclonite
  */
 public class WriteHandler implements Handler<RoutingContext> {

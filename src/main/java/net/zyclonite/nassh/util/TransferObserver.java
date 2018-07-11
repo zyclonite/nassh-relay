@@ -1,9 +1,9 @@
 /*
  * nassh-relay - Relay Server for tunneling ssh through a http endpoint
- * 
+ *
  * Website: https://github.com/zyclonite/nassh-relay
  *
- * Copyright 2014-2016   zyclonite    networx
+ * Copyright 2014-2018   zyclonite    networx
  *                       http://zyclonite.net
  * Developer: Lukas Prettenthaler
  */
@@ -21,7 +21,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 /**
- *
  * @author zyclonite
  */
 public class TransferObserver implements Observer {
@@ -40,22 +39,23 @@ public class TransferObserver implements Observer {
         if (request instanceof HttpServerRequest) {
             final Buffer buffer = ((TransferQueue) queue).poll();
             queue.deleteObserver(this);
-            final HttpServerRequest req = (HttpServerRequest)request;
+            final HttpServerRequest req = (HttpServerRequest) request;
+            assert buffer != null;
             final String encodedBytes = Base64.encodeBase64URLSafeString(buffer.getBytes());
             req.response().setStatusCode(200);
             req.response().end(encodedBytes);
-        }else if (request instanceof ServerWebSocket) {
+        } else if (request instanceof ServerWebSocket) {
             final Buffer buffer = ((TransferQueue) queue).poll();
-            final ServerWebSocket ws = (ServerWebSocket)request;
+            final ServerWebSocket ws = (ServerWebSocket) request;
             if (!ws.writeQueueFull()) {
                 final Buffer ackbuffer = Buffer.buffer();
                 ackbuffer.setInt(0, session.getWrite_count());
                 ackbuffer.setBuffer(4, buffer);
                 ws.write(ackbuffer);
-            }else{
+            } else {
                 ws.pause();
             }
-        }else{
+        } else {
             queue.deleteObserver(this);
         }
     }
