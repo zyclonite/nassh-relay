@@ -30,7 +30,7 @@ public class MainVerticle extends AbstractVerticle {
         server = vertx.createHttpServer();
         final Router router = Router.router(vertx);
         router.route().handler(CorsHandler
-            .create("^chrome-extension://(okddffdblfhhnmhodogpojmfkjmhinfp|pnhechapfaindjhompbnflcldabbghjo)$")
+            .create(".*")
             .allowCredentials(true)
         );
         router.route().handler(io.vertx.ext.web.handler.CookieHandler.create());
