@@ -9,7 +9,6 @@
  */
 package net.zyclonite.nassh.util;
 
-import io.vertx.core.http.HttpServerRequest;
 import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.RoutingContext;
 import net.zyclonite.nassh.model.AuthSession;
@@ -36,18 +35,5 @@ public class WebHelper {
             return session;
         }
         return null;
-    }
-
-    public static void putAccessControlAllowHeader(final HttpServerRequest request) {
-        if (!request.headers().contains("Origin")) {
-            return;
-        }
-        final String reqorigin = request.headers().get("Origin");
-        for (final String origin : Constants.ORIGINS) {
-            if (origin.equals(reqorigin)) {
-                request.response().putHeader("Access-Control-Allow-Origin", reqorigin);
-                return;
-            }
-        }
     }
 }

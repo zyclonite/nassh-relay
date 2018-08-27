@@ -13,6 +13,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.impl.VertxImpl;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -52,17 +53,16 @@ public class ProxyHandler implements Handler<RoutingContext> {
     public void handle(final RoutingContext context) {
         logger.debug("got request");
         final HttpServerRequest request = context.request();
-        WebHelper.putAccessControlAllowHeader(request);
-        request.response().putHeader("Access-Control-Allow-Credentials", "true");
-        request.response().putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
-        request.response().putHeader("Pragma", "no-cache");
+        final HttpServerResponse response = context.response();
+        response.putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+        response.putHeader("Pragma", "no-cache");
         if (request.params().contains("host") && request.params().contains("port")) {
             AuthSession authPreSession = null;
             if (authentication) {
                 authPreSession = WebHelper.validateCookie(context);
                 if (authPreSession == null) {
-                    request.response().setStatusCode(410);
-                    request.response().end("session invalid");
+                    response.setStatusCode(410);
+                    response.end("session invalid");
                     return;
                 }
             }
@@ -77,8 +77,8 @@ public class ProxyHandler implements Handler<RoutingContext> {
                 clienthost = request.remoteAddress().host();
             }
             if (sessions.size() >= sessionlimit) {
-                request.response().setStatusCode(410);
-                request.response().end("session limit reached");
+                response.setStatusCode(410);
+                response.end("session limit reached");
                 logger.warn("ssh session limit of " + sessionlimit + " reached");
                 return;
             }
@@ -91,34 +91,34 @@ public class ProxyHandler implements Handler<RoutingContext> {
                     }, false, res -> {
                         if (res.succeeded()) {
                             if (!res.result()) {
-                                request.response().setStatusCode(410);
-                                request.response().end("host not allowed");
+                                response.setStatusCode(410);
+                                response.end("host not allowed");
                                 logger.warn("client " + clienthost + " " + (authSession == null ? "" : "(" + authSession + ")") + " tried to access " + address.getHostAddress() + " but was not allowed");
                             } else {
                                 connectTcpEndpoint(sid, address.getHostAddress(), port, clienthost).setHandler(ar -> {
                                     if (ar.succeeded()) {
-                                        request.response().setStatusCode(200);
-                                        request.response().end(sid.toString());
+                                        response.setStatusCode(200);
+                                        response.end(sid.toString());
                                     } else {
-                                        request.response().setStatusCode(500);
-                                        request.response().end("could not init ssh session");
+                                        response.setStatusCode(500);
+                                        response.end("could not init ssh session");
                                     }
                                 });
                             }
                         } else {
                             logger.error(res.cause().getMessage(), res.cause());
-                            request.response().setStatusCode(500);
-                            request.response().end("internal server error");
+                            response.setStatusCode(500);
+                            response.end("internal server error");
                         }
                     });
                 } else {
-                    request.response().setStatusCode(410);
-                    request.response().end("invalid host");
+                    response.setStatusCode(410);
+                    response.end("invalid host");
                 }
             });
         } else {
-            request.response().setStatusCode(410);
-            request.response().end("error");
+            response.setStatusCode(410);
+            response.end("error");
         }
     }
 

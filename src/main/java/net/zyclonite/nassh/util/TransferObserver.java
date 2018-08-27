@@ -15,8 +15,8 @@ import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import net.zyclonite.nassh.model.Session;
-import org.apache.commons.codec.binary.Base64;
 
+import java.util.Base64;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -41,7 +41,7 @@ public class TransferObserver implements Observer {
             queue.deleteObserver(this);
             final HttpServerRequest req = (HttpServerRequest) request;
             assert buffer != null;
-            final String encodedBytes = Base64.encodeBase64URLSafeString(buffer.getBytes());
+            final String encodedBytes = Base64.getUrlEncoder().encodeToString(buffer.getBytes());
             req.response().setStatusCode(200);
             req.response().end(encodedBytes);
         } else if (request instanceof ServerWebSocket) {

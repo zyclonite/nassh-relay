@@ -32,12 +32,11 @@
     {"network":"172.16.0.0/12"},
     {"network":"127.0.0.0/8"},
     {"network":"10.0.0.0/8"},
-    {"network":"0.0.0.0/8"},
     {"network":"fe80::/10"},
     {"host":"127.0.0.1"}
   ],
   "google-sso":{
-    "title":"nassh-relay g+ Single Sign On",
+    "title":"nassh-relay Single Sign On",
     "client-id":"",
     "client-secret":""
   }

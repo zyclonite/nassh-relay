@@ -16,6 +16,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.CorsHandler;
 import net.zyclonite.nassh.handler.*;
 
 @SuppressWarnings("unused")
@@ -28,9 +29,13 @@ public class MainVerticle extends AbstractVerticle {
         final JsonObject config = config().getJsonObject("webservice");
         server = vertx.createHttpServer();
         final Router router = Router.router(vertx);
+        router.route().handler(CorsHandler
+            .create("^chrome-extension://(okddffdblfhhnmhodogpojmfkjmhinfp|pnhechapfaindjhompbnflcldabbghjo)$")
+            .allowCredentials(true)
+        );
         router.route().handler(io.vertx.ext.web.handler.CookieHandler.create());
         router.get("/cookie").handler(new CookieHandler(config().getJsonObject("application").copy().put("auth", config().getJsonObject("google-sso"))));
-        router.post("/cookie").handler(new CookiePostHandler(new JsonObject().put("auth", config().getJsonObject("google-sso"))));
+        router.post("/cookie").handler(new CookiePostHandler(vertx, new JsonObject().put("auth", config().getJsonObject("google-sso"))));
         router.get("/proxy").handler(new ProxyHandler(vertx, config()));
         router.get("/write").handler(new WriteHandler(vertx));
         router.get("/read").handler(new ReadHandler(vertx));

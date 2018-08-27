@@ -4,7 +4,7 @@
 
   <groupId>net.zyclonite.nassh</groupId>
   <artifactId>nassh-relay</artifactId>
-  <version>1.0.5</version>
+  <version>1.0.6</version>
 
   <organization>
       <name>zyclonite networx</name>
@@ -19,8 +19,7 @@
   </developers>
 
   <properties>
-      <vertx.version>3.5.2</vertx.version>
-      <googleapi.version>1.23.0</googleapi.version>
+      <vertx.version>3.5.3</vertx.version>
       <vertx.main>${project.groupId}.MainVerticle</vertx.main>
       <docker.group.name>zyclonite</docker.group.name>
       <docker.image>${docker.group.name}/${project.artifactId}:${project.version}</docker.image>
@@ -55,19 +54,8 @@
           <artifactId>vertx-web</artifactId>
       </dependency>
       <dependency>
-          <groupId>com.google.api-client</groupId>
-          <artifactId>google-api-client-jackson2</artifactId>
-          <version>${googleapi.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>com.google.oauth-client</groupId>
-          <artifactId>google-oauth-client</artifactId>
-          <version>${googleapi.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>commons-codec</groupId>
-          <artifactId>commons-codec</artifactId>
-          <version>1.11</version>
+          <groupId>io.vertx</groupId>
+          <artifactId>vertx-auth-oauth2</artifactId>
       </dependency>
       <dependency>
           <groupId>ch.qos.logback</groupId>
