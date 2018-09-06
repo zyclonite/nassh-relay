@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/zyclonite/nassh-relay.svg?style=svg)](https://circleci.com/gh/zyclonite/nassh-relay)
+
 # nassh-relay
 
 Relay Server for the Secure Shell Chromium plugin
