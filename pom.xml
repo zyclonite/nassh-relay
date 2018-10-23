@@ -4,7 +4,7 @@
 
   <groupId>net.zyclonite.nassh</groupId>
   <artifactId>nassh-relay</artifactId>
-  <version>1.0.6</version>
+  <version>1.0.7</version>
 
   <organization>
       <name>zyclonite networx</name>
@@ -19,7 +19,7 @@
   </developers>
 
   <properties>
-      <vertx.version>3.5.3</vertx.version>
+      <vertx.version>3.5.4</vertx.version>
       <vertx.main>${project.groupId}.MainVerticle</vertx.main>
       <docker.group.name>zyclonite</docker.group.name>
       <docker.image>${docker.group.name}/${project.artifactId}:${project.version}</docker.image>
@@ -79,7 +79,7 @@
       <plugins>
           <plugin>
               <artifactId>maven-compiler-plugin</artifactId>
-              <version>3.7.0</version>
+              <version>3.8.0</version>
               <configuration>
                   <source>1.8</source>
                   <target>1.8</target>
@@ -98,7 +98,7 @@
               <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-shade-plugin</artifactId>
-                  <version>3.1.0</version>
+                  <version>3.2.0</version>
                   <executions>
                       <execution>
                           <phase>package</phase>
@@ -123,13 +123,13 @@
               <plugin>
                   <groupId>io.fabric8</groupId>
                   <artifactId>docker-maven-plugin</artifactId>
-                  <version>0.25.2</version>
+                  <version>0.26.1</version>
                   <configuration>
                       <images>
                           <image>
                               <name>${docker.image}</name>
                               <build>
-                                  <from>openjdk:10-jre-slim</from>
+                                  <from>openjdk:11-jre-slim</from>
                                   <user>nobody</user>
                                   <tags>
                                       <tag>latest</tag>
