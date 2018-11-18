@@ -1,2 +1,2 @@
 #!/bin/sh
-java -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.SLF4JLogDelegateFactory --illegal-access=deny -Droot.level=INFO -jar ./target/nassh-relay-1.0.6-fat.jar -conf ./src/docker/config.json -cp .
+java -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.SLF4JLogDelegateFactory --illegal-access=deny -Droot.level=INFO -jar ./target/nassh-relay-1.0.7-fat.jar -conf ./src/docker/config.json -cp .

@@ -15,6 +15,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.impl.VertxImpl;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -40,6 +41,9 @@ public class ProxyHandler implements Handler<RoutingContext> {
     private final boolean authentication;
     private final Vertx vertx;
     private final JsonObject config;
+    private final JsonArray accessList;
+    private final JsonArray whiteList;
+    private final JsonArray blackList;
 
     public ProxyHandler(final Vertx vertx, final JsonObject config) {
         this.vertx = vertx;
@@ -47,6 +51,9 @@ public class ProxyHandler implements Handler<RoutingContext> {
         this.authentication = config.getJsonObject("application").getBoolean("authentication", true);
         this.sessions = vertx.sharedData().getLocalMap(Constants.SESSIONS);
         this.sessionlimit = config.getJsonObject("application").getInteger("max-sessions", 100);
+        this.accessList = config.getJsonArray("accesslist", new JsonArray());
+        this.whiteList = config.getJsonArray("whitelist", new JsonArray());
+        this.blackList = config.getJsonArray("blacklist", new JsonArray());
     }
 
     @Override
@@ -86,7 +93,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
                 if (result.succeeded()) {
                     final InetAddress address = result.result();
                     vertx.<Boolean>executeBlocking(future -> {
-                        final boolean isAllowed = AccessHelper.isHostAllowed(config.getJsonArray("accesslist"), config.getJsonArray("whitelist"), config.getJsonArray("blacklist"), address, authSession);
+                        final boolean isAllowed = AccessHelper.isHostAllowed(accessList, whiteList, blackList, address, authSession);
                         future.complete(isAllowed);
                     }, false, res -> {
                         if (res.succeeded()) {
