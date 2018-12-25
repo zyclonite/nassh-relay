@@ -39,7 +39,7 @@ public class MainVerticle extends AbstractVerticle {
         router.get("/proxy").handler(new ProxyHandler(vertx, config()));
         router.get("/write").handler(new WriteHandler(vertx));
         router.get("/read").handler(new ReadHandler(vertx));
-        server.requestHandler(router::accept);
+        server.requestHandler(router);
         server.websocketHandler(new ConnectHandler(vertx));
         server.listen(config.getInteger("port", 8022), config.getString("hostname", "localhost"),
             result -> {
@@ -54,7 +54,7 @@ public class MainVerticle extends AbstractVerticle {
     }
 
     @Override
-    public void stop(final Future<Void> stopFuture) throws Exception {
+    public void stop(final Future<Void> stopFuture) {
         logger.debug("stopped");
         if (server != null) {
             server.close(complete -> stopFuture.complete());

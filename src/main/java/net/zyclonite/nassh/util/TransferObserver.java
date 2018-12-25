@@ -12,8 +12,6 @@ package net.zyclonite.nassh.util;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.ServerWebSocket;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import net.zyclonite.nassh.model.Session;
 
 import java.util.Base64;
@@ -25,9 +23,8 @@ import java.util.Observer;
  */
 public class TransferObserver implements Observer {
 
-    private static Logger logger = LoggerFactory.getLogger(TransferObserver.class);
-    private Object request = null;
-    private Session session = null;
+    private Object request;
+    private Session session;
 
     public TransferObserver(final Session session, final Object request) {
         this.request = request;
