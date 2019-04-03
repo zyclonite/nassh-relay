@@ -19,7 +19,7 @@
   </developers>
 
   <properties>
-      <vertx.version>3.6.3</vertx.version>
+      <vertx.version>3.7.0</vertx.version>
       <vertx.main>${project.groupId}.MainVerticle</vertx.main>
       <docker.group.name>zyclonite</docker.group.name>
       <docker.image>${docker.group.name}/${project.artifactId}:${project.version}</docker.image>
@@ -123,13 +123,13 @@
               <plugin>
                   <groupId>io.fabric8</groupId>
                   <artifactId>docker-maven-plugin</artifactId>
-                  <version>0.27.2</version>
+                  <version>0.28.0</version>
                   <configuration>
                       <images>
                           <image>
                               <name>${docker.image}</name>
                               <build>
-                                  <from>openjdk:11-jre-slim</from>
+                                  <from>openjdk:12-jdk</from>
                                   <user>nobody</user>
                                   <tags>
                                       <tag>latest</tag>
