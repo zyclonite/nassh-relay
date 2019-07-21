@@ -10,7 +10,7 @@
 package net.zyclonite.nassh;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -25,7 +25,7 @@ public class MainVerticle extends AbstractVerticle {
     private HttpServer server;
 
     @Override
-    public void start(final Future<Void> startFuture) {
+    public void start(final Promise<Void> startPromise) {
         final JsonObject config = config().getJsonObject("webservice");
         server = vertx.createHttpServer();
         final Router router = Router.router(vertx);
@@ -45,21 +45,21 @@ public class MainVerticle extends AbstractVerticle {
             result -> {
                 if (result.succeeded()) {
                     logger.info("nassh-relay listening on port " + result.result().actualPort());
-                    startFuture.complete();
+                    startPromise.complete();
                 } else {
-                    startFuture.fail(result.cause());
+                    startPromise.fail(result.cause());
                 }
             }
         );
     }
 
     @Override
-    public void stop(final Future<Void> stopFuture) {
+    public void stop(final Promise<Void> stopPromise) {
         logger.debug("stopped");
         if (server != null) {
-            server.close(complete -> stopFuture.complete());
+            server.close(complete -> stopPromise.complete());
         } else {
-            stopFuture.complete();
+            stopPromise.complete();
         }
     }
 }

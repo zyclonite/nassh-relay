@@ -9,8 +9,8 @@
  */
 package net.zyclonite.nassh.handler;
 
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
@@ -92,9 +92,9 @@ public class ProxyHandler implements Handler<RoutingContext> {
             ((VertxImpl) vertx).resolveAddress(host, result -> {
                 if (result.succeeded()) {
                     final InetAddress address = result.result();
-                    vertx.<Boolean>executeBlocking(future -> {
+                    vertx.<Boolean>executeBlocking(promise -> {
                         final boolean isAllowed = AccessHelper.isHostAllowed(accessList, whiteList, blackList, address, authSession);
-                        future.complete(isAllowed);
+                        promise.complete(isAllowed);
                     }, false, res -> {
                         if (res.succeeded()) {
                             if (!res.result()) {
@@ -102,7 +102,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
                                 response.end("host not allowed");
                                 logger.warn("client " + clienthost + " " + (authSession == null ? "" : "(" + authSession + ")") + " tried to access " + address.getHostAddress() + " but was not allowed");
                             } else {
-                                connectTcpEndpoint(sid, address.getHostAddress(), port, clienthost).setHandler(ar -> {
+                                connectTcpEndpoint(sid, address.getHostAddress(), port, clienthost).future().setHandler(ar -> {
                                     if (ar.succeeded()) {
                                         response.setStatusCode(200);
                                         response.end(sid.toString());
@@ -129,8 +129,8 @@ public class ProxyHandler implements Handler<RoutingContext> {
         }
     }
 
-    private Future<UUID> connectTcpEndpoint(final UUID sid, final String host, final int port, final String clienthost) {
-        final Future<UUID> future = Future.future();
+    private Promise<UUID> connectTcpEndpoint(final UUID sid, final String host, final int port, final String clienthost) {
+        final Promise<UUID> promise = Promise.promise();
         final NetClient client = vertx.createNetClient(new NetClientOptions().setReconnectAttempts(10).setReconnectInterval(500));
         client.connect(port, host, asyncResult -> {
             if (asyncResult.succeeded()) {
@@ -158,13 +158,13 @@ public class ProxyHandler implements Handler<RoutingContext> {
                 session.setHandler(asyncResult.result().writeHandlerID());
                 sessions.put(sid.toString(), session);
                 registerTimerOut(session, client);
-                future.complete(sid);
+                promise.complete(sid);
             } else {
-                future.fail(asyncResult.cause());
+                promise.fail(asyncResult.cause());
                 logger.warn("Could not connect to ssh server: " + asyncResult.cause().getMessage(), asyncResult.cause());
             }
         });
-        return future;
+        return promise;
     }
 
     private void registerTimerOut(final Session session, final NetClient client) {
