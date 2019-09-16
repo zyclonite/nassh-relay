@@ -20,6 +20,7 @@ import io.vertx.ext.web.RoutingContext;
 import net.zyclonite.nassh.model.AuthSession;
 import net.zyclonite.nassh.util.AuthSessionManager;
 import net.zyclonite.nassh.util.Constants;
+import net.zyclonite.nassh.util.RequestHelper;
 import net.zyclonite.nassh.util.WebHelper;
 
 import java.math.BigInteger;
@@ -54,7 +55,7 @@ public class CookieHandler implements Handler<RoutingContext> {
             final String ext = request.params().get("ext");
             final String path = request.params().get("path");
             if (!authentication) {
-                response.putHeader("location", "chrome-extension://" + ext + "/" + path + "#anonymous@" + request.host());
+                response.putHeader("location", "chrome-extension://" + ext + "/" + path + "#anonymous@" + RequestHelper.getHost(request));
                 response.setStatusCode(302);
                 response.end();
                 return;
@@ -62,7 +63,7 @@ public class CookieHandler implements Handler<RoutingContext> {
             final AuthSession authSession = WebHelper.validateCookie(context);
             if (authSession != null) {
                 final String gplusid = authSession.get("id");
-                response.putHeader("location", "chrome-extension://" + ext + "/" + path + "#" + gplusid + "@" + request.host());
+                response.putHeader("location", "chrome-extension://" + ext + "/" + path + "#" + gplusid + "@" + RequestHelper.getHost(request));
                 response.setStatusCode(302);
                 response.end();
             } else {

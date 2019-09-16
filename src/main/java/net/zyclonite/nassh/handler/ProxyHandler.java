@@ -77,12 +77,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
             final String host = request.params().get("host");
             final int port = Integer.parseInt(request.params().get("port"));
             final UUID sid = UUID.randomUUID();
-            final String clienthost;
-            if (request.headers().contains("X-Real-IP")) {
-                clienthost = request.headers().get("X-Real-IP");
-            } else {
-                clienthost = request.remoteAddress().host();
-            }
+            final String clienthost = RequestHelper.getRemoteHost(request);
             if (sessions.size() >= sessionlimit) {
                 response.setStatusCode(410);
                 response.end("session limit reached");
