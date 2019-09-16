@@ -4,7 +4,7 @@
 
   <groupId>net.zyclonite.nassh</groupId>
   <artifactId>nassh-relay</artifactId>
-  <version>1.0.9</version>
+  <version>1.0.10</version>
 
   <organization>
       <name>zyclonite networx</name>
@@ -19,7 +19,7 @@
   </developers>
 
   <properties>
-      <vertx.version>3.8.0</vertx.version>
+      <vertx.version>3.8.1</vertx.version>
       <vertx.main>${project.groupId}.MainVerticle</vertx.main>
       <docker.group.name>zyclonite</docker.group.name>
       <docker.image>${docker.group.name}/${project.artifactId}:${project.version}</docker.image>

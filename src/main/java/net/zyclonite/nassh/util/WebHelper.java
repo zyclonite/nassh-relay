@@ -9,7 +9,7 @@
  */
 package net.zyclonite.nassh.util;
 
-import io.vertx.ext.web.Cookie;
+import io.vertx.core.http.Cookie;
 import io.vertx.ext.web.RoutingContext;
 import net.zyclonite.nassh.model.AuthSession;
 

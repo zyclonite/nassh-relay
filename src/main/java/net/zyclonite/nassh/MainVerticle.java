@@ -33,7 +33,6 @@ public class MainVerticle extends AbstractVerticle {
             .create(".*")
             .allowCredentials(true)
         );
-        router.route().handler(io.vertx.ext.web.handler.CookieHandler.create());
         router.get("/cookie").handler(new CookieHandler(config().getJsonObject("application").copy().put("auth", config().getJsonObject("google-sso"))));
         router.post("/cookie").handler(new CookiePostHandler(vertx, new JsonObject().put("auth", config().getJsonObject("google-sso"))));
         router.get("/proxy").handler(new ProxyHandler(vertx, config()));
