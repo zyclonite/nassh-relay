@@ -19,7 +19,7 @@
   </developers>
 
   <properties>
-      <vertx.version>3.8.2</vertx.version>
+      <vertx.version>3.8.3</vertx.version>
       <vertx.main>${project.groupId}.MainVerticle</vertx.main>
       <docker.group.name>zyclonite</docker.group.name>
       <docker.image>${docker.group.name}/${project.artifactId}:${project.version}</docker.image>
