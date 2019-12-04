@@ -4,7 +4,7 @@
 
   <groupId>net.zyclonite.nassh</groupId>
   <artifactId>nassh-relay</artifactId>
-  <version>1.0.11</version>
+  <version>1.1.0</version>
 
   <organization>
       <name>zyclonite networx</name>
@@ -19,15 +19,8 @@
   </developers>
 
   <properties>
-      <vertx.version>3.8.3</vertx.version>
+      <vertx.version>3.8.4</vertx.version>
       <vertx.main>${project.groupId}.MainVerticle</vertx.main>
-      <docker.group.name>zyclonite</docker.group.name>
-      <docker.image>${docker.group.name}/${project.artifactId}:${project.version}</docker.image>
-      <docker.push.registry>registry.hub.docker.com</docker.push.registry>
-      <docker.push.retries>3</docker.push.retries>
-      <docker.autoPull>always</docker.autoPull>
-      <maven.compiler.source>1.8</maven.compiler.source>
-      <maven.compiler.target>1.8</maven.compiler.target>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
@@ -81,16 +74,16 @@
               <artifactId>maven-compiler-plugin</artifactId>
               <version>3.8.0</version>
               <configuration>
-                  <source>1.8</source>
-                  <target>1.8</target>
+                  <source>11</source>
+                  <target>11</target>
+                  <compilerArgs>
+                      <arg>-Xlint:unchecked</arg>
+                      <arg>-Xlint:deprecation</arg>
+                  </compilerArgs>
               </configuration>
           </plugin>
           <plugin>
               <artifactId>maven-shade-plugin</artifactId>
-          </plugin>
-          <plugin>
-              <groupId>io.fabric8</groupId>
-              <artifactId>docker-maven-plugin</artifactId>
           </plugin>
       </plugins>
       <pluginManagement>
@@ -99,6 +92,18 @@
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-shade-plugin</artifactId>
                   <version>3.2.0</version>
+                  <configuration>
+                      <filters>
+                          <filter>
+                              <artifact>*:*</artifact>
+                              <excludes>
+                                  <exclude>META-INF/*.SF</exclude>
+                                  <exclude>META-INF/*.DSA</exclude>
+                                  <exclude>META-INF/*.RSA</exclude>
+                              </excludes>
+                          </filter>
+                      </filters>
+                  </configuration>
                   <executions>
                       <execution>
                           <phase>package</phase>
@@ -115,59 +120,10 @@
                                   </transformer>
                               </transformers>
                               <artifactSet/>
-                              <outputFile>${project.build.directory}/${project.artifactId}-${project.version}-fat.jar</outputFile>
+                              <outputFile>${project.build.directory}/${project.artifactId}-app.jar</outputFile>
                           </configuration>
                       </execution>
                   </executions>
-              </plugin>
-              <plugin>
-                  <groupId>io.fabric8</groupId>
-                  <artifactId>docker-maven-plugin</artifactId>
-                  <version>0.30.0</version>
-                  <configuration>
-                      <images>
-                          <image>
-                              <name>${docker.image}</name>
-                              <build>
-                                  <from>openjdk:13-jdk-slim</from>
-                                  <user>nobody</user>
-                                  <tags>
-                                      <tag>latest</tag>
-                                      <tag>${project.version}</tag>
-                                  </tags>
-                                  <workdir>/opt</workdir>
-                                  <env>
-                                      <JAVA_LOG_LEVEL>INFO</JAVA_LOG_LEVEL>
-                                  </env>
-                                  <entryPoint>
-                                      <shell>exec java -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.SLF4JLogDelegateFactory -Droot.level=${JAVA_LOG_LEVEL} --illegal-access=deny -jar ${project.artifactId}-${project.version}-fat.jar -conf config.json -cp .</shell>
-                                  </entryPoint>
-                                  <runCmds>
-                                      <runcmd>chmod -R 777 /opt</runcmd>
-                                  </runCmds>
-                                  <assembly>
-                                      <basedir>/</basedir>
-                                      <inline>
-                                          <files>
-                                              <file>
-                                                  <source>${project.build.directory}/${project.artifactId}-${project.version}-fat.jar</source>
-                                                  <outputDirectory>opt</outputDirectory>
-                                                  <fileMode>0755</fileMode>
-                                              </file>
-                                          </files>
-                                          <fileSets>
-                                              <fileSet>
-                                                  <directory>${project.basedir}/src/docker/</directory>
-                                                  <outputDirectory>opt</outputDirectory>
-                                                  <fileMode>0755</fileMode>
-                                              </fileSet>
-                                          </fileSets>
-                                      </inline>
-                                  </assembly>
-                              </build>
-                          </image>
-                      </images>
-                  </configuration>
               </plugin>
           </plugins>
       </pluginManagement>
