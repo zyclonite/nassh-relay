@@ -3,13 +3,12 @@
  *
  * Website: https://github.com/zyclonite/nassh-relay
  *
- * Copyright 2014-2018   zyclonite    networx
+ * Copyright 2014-2020   zyclonite    networx
  *                       http://zyclonite.net
  * Developer: Lukas Prettenthaler
  */
 package net.zyclonite.nassh.handler;
 
-import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
@@ -71,7 +70,8 @@ public class CookieHandler implements Handler<RoutingContext> {
                 final String state = new BigInteger(130, new SecureRandom()).toString(32);
                 final AuthSession session = AuthSessionManager.createSession(sessionTTL);
                 session.put("state", state);
-                response.putHeader("Set-Cookie", ServerCookieEncoder.LAX.encode(Constants.SESSIONCOOKIE, session.getId().toString()));
+                //TODO: fix when vertx cookie support SameSite (https://github.com/eclipse-vertx/vert.x/pull/3202)
+                response.putHeader("Set-Cookie", Constants.SESSIONCOOKIE+"="+session.getId().toString()+"; SameSite=None; HttpOnly; Secure");
                 final String auth_html = new Scanner(this.getClass().getResourceAsStream(STATIC_FILE), "UTF-8")
                     .useDelimiter("\\A").next()
                     .replaceAll("[{]{2}\\s*CLIENT_ID\\s*[}]{2}", auth.getString("client-id"))

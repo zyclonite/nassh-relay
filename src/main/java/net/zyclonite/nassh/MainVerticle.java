@@ -3,7 +3,7 @@
  *
  * Website: https://github.com/zyclonite/nassh-relay
  *
- * Copyright 2014-2018   zyclonite    networx
+ * Copyright 2014-2020   zyclonite    networx
  *                       http://zyclonite.net
  * Developer: Lukas Prettenthaler
  */
@@ -12,9 +12,11 @@ package net.zyclonite.nassh;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.core.net.SelfSignedCertificate;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.CorsHandler;
 import net.zyclonite.nassh.handler.*;
@@ -26,8 +28,19 @@ public class MainVerticle extends AbstractVerticle {
 
     @Override
     public void start(final Promise<Void> startPromise) {
-        final JsonObject config = config().getJsonObject("webservice");
-        server = vertx.createHttpServer();
+        final JsonObject webserviceConfig = config().getJsonObject("webservice");
+        if (webserviceConfig.containsKey("hostname")) {
+            logger.warn("webservice.hostname will be deprecated in future releases, please use webservice.host instead");
+            webserviceConfig.put("host", webserviceConfig.getString("hostname", webserviceConfig.getString("host")));
+        }
+        final HttpServerOptions options = new HttpServerOptions(webserviceConfig);
+        if (options.isSsl() && options.getKeyCertOptions() == null) {
+            logger.warn("no certificate configured, creating self-signed");
+            final SelfSignedCertificate certificate = SelfSignedCertificate.create();
+            options.setKeyCertOptions(certificate.keyCertOptions());
+            options.setTrustOptions(certificate.trustOptions());
+        }
+        server = vertx.createHttpServer(options);
         final Router router = Router.router(vertx);
         router.route().handler(CorsHandler
             .create(".*")
@@ -40,8 +53,7 @@ public class MainVerticle extends AbstractVerticle {
         router.get("/read").handler(new ReadHandler(vertx));
         server.requestHandler(router);
         server.websocketHandler(new ConnectHandler(vertx));
-        server.listen(config.getInteger("port", 8022), config.getString("hostname", "localhost"),
-            result -> {
+        server.listen(result -> {
                 if (result.succeeded()) {
                     logger.info("nassh-relay listening on port " + result.result().actualPort());
                     startPromise.complete();
