@@ -5,6 +5,7 @@
   },
   "application":{
     "authentication":false,
+    "secure-cookie":true,
     "max-sessions":100,
     "tcp-session-timeout":1200,
     "auth-session-timeout":600

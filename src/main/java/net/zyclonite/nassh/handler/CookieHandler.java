@@ -34,11 +34,13 @@ public class CookieHandler implements Handler<RoutingContext> {
     private static Logger logger = LoggerFactory.getLogger(CookieHandler.class);
     private static final String STATIC_FILE = "/webroot/auth.html";
     private final boolean authentication;
+    private final boolean secureCookie;
     private final int sessionTTL;
     private final JsonObject auth;
 
     public CookieHandler(final JsonObject config) {
         this.authentication = config.getBoolean("authentication", true);
+        this.secureCookie = config.getBoolean("secure-cookie", true);
         this.sessionTTL = config.getInteger("auth-session-timeout", 600);
         this.auth = config.getJsonObject("auth");
     }
@@ -71,7 +73,7 @@ public class CookieHandler implements Handler<RoutingContext> {
                 final AuthSession session = AuthSessionManager.createSession(sessionTTL);
                 session.put("state", state);
                 //TODO: fix when vertx cookie support SameSite (https://github.com/eclipse-vertx/vert.x/pull/3202)
-                response.putHeader("Set-Cookie", Constants.SESSIONCOOKIE+"="+session.getId().toString()+"; SameSite=None; HttpOnly; Secure");
+                response.putHeader("Set-Cookie", Constants.SESSIONCOOKIE + "=" + session.getId().toString() + "; HttpOnly" + (secureCookie ? "; SameSite=None; Secure" : ""));
                 final String auth_html = new Scanner(this.getClass().getResourceAsStream(STATIC_FILE), "UTF-8")
                     .useDelimiter("\\A").next()
                     .replaceAll("[{]{2}\\s*CLIENT_ID\\s*[}]{2}", auth.getString("client-id"))
