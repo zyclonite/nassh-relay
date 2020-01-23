@@ -3,7 +3,7 @@
  *
  * Website: https://github.com/zyclonite/nassh-relay
  *
- * Copyright 2014-2018   zyclonite    networx
+ * Copyright 2014-2020   zyclonite    networx
  *                       http://zyclonite.net
  * Developer: Lukas Prettenthaler
  */
