@@ -1,10 +1,11 @@
 {
   "webservice":{
     "host":"0.0.0.0",
-    "port":8022
+    "port":8022,
+    "ssl":false
   },
   "application":{
-    "authentication":false,
+    "authentication":true,
     "secure-cookie":true,
     "max-sessions":100,
     "tcp-session-timeout":1200,
