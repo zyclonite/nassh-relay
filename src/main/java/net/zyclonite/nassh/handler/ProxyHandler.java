@@ -97,7 +97,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
                                 response.end("host not allowed");
                                 logger.warn("client " + clienthost + " " + (authSession == null ? "" : "(" + authSession + ")") + " tried to access " + address.getHostAddress() + " but was not allowed");
                             } else {
-                                connectTcpEndpoint(sid, address.getHostAddress(), port, clienthost).future().setHandler(ar -> {
+                                connectTcpEndpoint(sid, address.getHostAddress(), port, clienthost).future().onComplete(ar -> {
                                     if (ar.succeeded()) {
                                         response.setStatusCode(200);
                                         response.end(sid.toString());

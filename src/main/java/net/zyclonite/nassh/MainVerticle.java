@@ -52,7 +52,7 @@ public class MainVerticle extends AbstractVerticle {
         router.get("/write").handler(new WriteHandler(vertx));
         router.get("/read").handler(new ReadHandler(vertx));
         server.requestHandler(router);
-        server.websocketHandler(new ConnectHandler(vertx));
+        server.webSocketHandler(new ConnectHandler(vertx));
         server.listen(result -> {
                 if (result.succeeded()) {
                     logger.info("nassh-relay listening on port " + result.result().actualPort());

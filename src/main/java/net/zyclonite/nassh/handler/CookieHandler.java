@@ -10,6 +10,8 @@
 package net.zyclonite.nassh.handler;
 
 import io.vertx.core.Handler;
+import io.vertx.core.http.Cookie;
+import io.vertx.core.http.CookieSameSite;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
@@ -72,8 +74,15 @@ public class CookieHandler implements Handler<RoutingContext> {
                 final String state = new BigInteger(130, new SecureRandom()).toString(32);
                 final AuthSession session = AuthSessionManager.createSession(sessionTTL);
                 session.put("state", state);
-                //TODO: fix when vertx cookie support SameSite (https://github.com/eclipse-vertx/vert.x/pull/3202)
-                response.putHeader("Set-Cookie", Constants.SESSIONCOOKIE + "=" + session.getId().toString() + "; HttpOnly" + (secureCookie ? "; SameSite=None; Secure" : ""));
+                final Cookie sessionCookie = Cookie
+                    .cookie(Constants.SESSIONCOOKIE, session.getId().toString())
+                    .setHttpOnly(true);
+                if (secureCookie) {
+                    sessionCookie
+                        .setSameSite(CookieSameSite.NONE)
+                        .setSecure(true);
+                }
+                response.addCookie(sessionCookie);
                 final String auth_html = new Scanner(this.getClass().getResourceAsStream(STATIC_FILE), "UTF-8")
                     .useDelimiter("\\A").next()
                     .replaceAll("[{]{2}\\s*CLIENT_ID\\s*[}]{2}", auth.getString("client-id"))
