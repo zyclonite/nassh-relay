@@ -19,7 +19,7 @@
   </developers>
 
   <properties>
-      <vertx.version>3.8.5</vertx.version>
+      <vertx.version>3.9.0</vertx.version>
       <vertx.main>${project.groupId}.MainVerticle</vertx.main>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
