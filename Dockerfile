@@ -6,7 +6,7 @@ ADD . /src
 RUN mvn -B clean package
 
 
-FROM openjdk:11-jre-stretch
+FROM openjdk:11-jre-slim-buster
 
 WORKDIR /opt
 
