@@ -15,11 +15,11 @@ import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.ServerWebSocket;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.shareddata.LocalMap;
 import net.zyclonite.nassh.model.Session;
 import net.zyclonite.nassh.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -56,7 +56,7 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
             try {
                 queue = QueueFactory.getQueue(sid.toString());
             } catch (final NoSuchQueueException ex) {
-                logger.warn(ex, ex.fillInStackTrace());
+                logger.warn(ex.getMessage(), ex.fillInStackTrace());
                 ws.reject();
                 ws.close();
                 return;

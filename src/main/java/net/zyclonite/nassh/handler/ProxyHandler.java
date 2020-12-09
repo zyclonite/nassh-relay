@@ -17,8 +17,6 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.impl.VertxImpl;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.shareddata.LocalMap;
@@ -26,6 +24,8 @@ import io.vertx.ext.web.RoutingContext;
 import net.zyclonite.nassh.model.AuthSession;
 import net.zyclonite.nassh.model.Session;
 import net.zyclonite.nassh.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.util.UUID;
@@ -141,7 +141,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
                             asyncResult.result().pause();
                         }
                     } catch (NoSuchQueueException ex) {
-                        logger.warn(ex, ex.fillInStackTrace());
+                        logger.warn(ex.getMessage(), ex.fillInStackTrace());
                     }
                 });
                 asyncResult.result().closeHandler(v -> {

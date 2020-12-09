@@ -15,14 +15,14 @@ import io.vertx.core.http.CookieSameSite;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.RoutingContext;
 import net.zyclonite.nassh.model.AuthSession;
 import net.zyclonite.nassh.util.AuthSessionManager;
 import net.zyclonite.nassh.util.Constants;
 import net.zyclonite.nassh.util.RequestHelper;
 import net.zyclonite.nassh.util.WebHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;

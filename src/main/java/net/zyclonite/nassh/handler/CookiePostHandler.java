@@ -15,8 +15,6 @@ import io.vertx.core.http.Cookie;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.auth.oauth2.AccessToken;
 import io.vertx.ext.auth.oauth2.OAuth2Auth;
 import io.vertx.ext.auth.oauth2.providers.GoogleAuth;
@@ -24,6 +22,8 @@ import io.vertx.ext.web.RoutingContext;
 import net.zyclonite.nassh.model.AuthSession;
 import net.zyclonite.nassh.util.AuthSessionManager;
 import net.zyclonite.nassh.util.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 

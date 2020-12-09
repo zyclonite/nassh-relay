@@ -14,12 +14,12 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.shareddata.LocalMap;
 import io.vertx.ext.web.RoutingContext;
 import net.zyclonite.nassh.model.Session;
 import net.zyclonite.nassh.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Base64;
 import java.util.UUID;
@@ -58,7 +58,7 @@ public class ReadHandler implements Handler<RoutingContext> {
             try {
                 queue = QueueFactory.getQueue(sid.toString());
             } catch (NoSuchQueueException ex) {
-                logger.warn(ex, ex.fillInStackTrace());
+                logger.warn(ex.getMessage(), ex.fillInStackTrace());
                 response.setStatusCode(410);
                 response.end();
                 return;
