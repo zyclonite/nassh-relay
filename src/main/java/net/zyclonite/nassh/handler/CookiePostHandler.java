@@ -15,7 +15,8 @@ import io.vertx.core.http.Cookie;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.oauth2.AccessToken;
+import io.vertx.ext.auth.User;
+import io.vertx.ext.auth.impl.jose.JWT;
 import io.vertx.ext.auth.oauth2.OAuth2Auth;
 import io.vertx.ext.auth.oauth2.providers.GoogleAuth;
 import io.vertx.ext.web.RoutingContext;
@@ -79,16 +80,16 @@ public class CookiePostHandler implements Handler<RoutingContext> {
                 .put("code", body.toString())
                 .put("redirect_uri", "postmessage");
             oauth2.authenticate(tokenConfig, ar -> {
-                if (ar.succeeded() && ar.result() instanceof AccessToken) {
-                    final AccessToken accessToken = (AccessToken) ar.result();
-                    accessToken.setTrustJWT(true);
-                    final JsonObject user = accessToken.idToken();
-                    final String id = user.getString("sub");
-                    final String email = user.getString("email");
-                    final String hostedDomain = user.getString("hd");
+                if (ar.succeeded() && ar.result() != null) {
+                    final User user = ar.result();
+                    final JsonObject idToken = JWT.parse(user.principal().getString("id_token"))
+                        .getJsonObject("payload");
+                    final String id = idToken.getString("sub");
+                    final String email = idToken.getString("email");
+                    final String hostedDomain = idToken.getString("hd");
 
                     logger.info("Google User: id: " + id + " email: " + email + " domain: " + hostedDomain + " logged in");
-                    session.put("token", accessToken.opaqueAccessToken());
+                    session.put("token", user.principal().getString("access_token"));
                     session.put("id", id);
                     session.put("email", email);
                     session.put("domain", hostedDomain);

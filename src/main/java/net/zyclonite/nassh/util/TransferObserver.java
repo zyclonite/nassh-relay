@@ -15,26 +15,23 @@ import io.vertx.core.http.ServerWebSocket;
 import net.zyclonite.nassh.model.Session;
 
 import java.util.Base64;
-import java.util.Observable;
-import java.util.Observer;
 
 /**
  * @author zyclonite
  */
-public class TransferObserver implements Observer {
+public class TransferObserver {
 
-    private Object request;
-    private Session session;
+    private final Object request;
+    private final Session session;
 
     public TransferObserver(final Session session, final Object request) {
         this.request = request;
         this.session = session;
     }
 
-    @Override
-    public void update(final Observable queue, final Object arg) {
+    public void update(final TransferQueue queue) {
         if (request instanceof HttpServerRequest) {
-            final Buffer buffer = ((TransferQueue) queue).poll();
+            final Buffer buffer = queue.poll();
             queue.deleteObserver(this);
             final HttpServerRequest req = (HttpServerRequest) request;
             assert buffer != null;
@@ -42,7 +39,7 @@ public class TransferObserver implements Observer {
             req.response().setStatusCode(200);
             req.response().end(encodedBytes);
         } else if (request instanceof ServerWebSocket) {
-            final Buffer buffer = ((TransferQueue) queue).poll();
+            final Buffer buffer = queue.poll();
             final ServerWebSocket ws = (ServerWebSocket) request;
             if (!ws.writeQueueFull()) {
                 final Buffer ackbuffer = Buffer.buffer();

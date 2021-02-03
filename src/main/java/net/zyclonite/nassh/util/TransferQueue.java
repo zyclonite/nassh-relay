@@ -11,18 +11,69 @@ package net.zyclonite.nassh.util;
 
 import io.vertx.core.buffer.Buffer;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Observable;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * @author zyclonite
  */
-public class TransferQueue extends Observable implements Queue<Buffer> {
-
+public class TransferQueue implements Queue<Buffer> {
+    private boolean changed = false;
+    private Vector<TransferObserver> obs;
     private final ConcurrentLinkedQueue<Buffer> queue = new ConcurrentLinkedQueue<>();
+
+    public TransferQueue() {
+        obs = new Vector<>();
+    }
+
+    public synchronized void addObserver(final TransferObserver o) {
+        if (o == null) {
+            throw new NullPointerException();
+        }
+        if (!obs.contains(o)) {
+            obs.addElement(o);
+        }
+    }
+
+    protected synchronized void deleteObserver(final TransferObserver o) {
+        obs.removeElement(o);
+    }
+
+    public synchronized void deleteObservers() {
+        obs.removeAllElements();
+    }
+
+    public synchronized int countObservers() {
+        return obs.size();
+    }
+
+    private synchronized void setChanged() {
+        changed = true;
+    }
+
+    private synchronized void clearChanged() {
+        changed = false;
+    }
+
+    private void notifyObservers() {
+        final TransferObserver[] arrLocal;
+
+        synchronized (this) {
+            if (!changed) {
+                return;
+            }
+            arrLocal = obs.toArray(new TransferObserver[0]);
+            clearChanged();
+        }
+
+        for (int i = arrLocal.length - 1; i >= 0; i--) {
+            arrLocal[i].update(this);
+        }
+    }
+
+    public boolean isFull() {
+        return queue.size() >= Constants.QUEUEMAXSIZE;
+    }
 
     @Override
     public Buffer poll() {
@@ -39,8 +90,19 @@ public class TransferQueue extends Observable implements Queue<Buffer> {
         return false;
     }
 
-    public boolean isFull() {
-        return queue.size() >= Constants.QUEUEMAXSIZE;
+    @Override
+    public Buffer peek() {
+        return queue.peek();
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return queue.remove(o);
+    }
+
+    @Override
+    public void clear() {
+        queue.clear();
     }
 
     @Override
@@ -56,11 +118,6 @@ public class TransferQueue extends Observable implements Queue<Buffer> {
     @Override
     public Buffer element() {
         throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Buffer peek() {
-        return queue.peek();
     }
 
     @Override
@@ -94,11 +151,6 @@ public class TransferQueue extends Observable implements Queue<Buffer> {
     }
 
     @Override
-    public boolean remove(Object o) {
-        return queue.remove(o);
-    }
-
-    @Override
     public boolean containsAll(Collection<?> c) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -116,10 +168,5 @@ public class TransferQueue extends Observable implements Queue<Buffer> {
     @Override
     public boolean retainAll(Collection<?> c) {
         throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void clear() {
-        queue.clear();
     }
 }

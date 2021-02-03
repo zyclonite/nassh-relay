@@ -4,7 +4,7 @@
 
   <groupId>net.zyclonite.nassh</groupId>
   <artifactId>nassh-relay</artifactId>
-  <version>1.1.7</version>
+  <version>1.1.8</version>
 
   <organization>
       <name>zyclonite networx</name>
@@ -19,7 +19,7 @@
   </developers>
 
   <properties>
-      <vertx.version>4.0.0</vertx.version>
+      <vertx.version>4.0.1</vertx.version>
       <vertx.main>${project.groupId}.MainVerticle</vertx.main>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -53,7 +53,7 @@
       <dependency>
           <groupId>org.bouncycastle</groupId>
           <artifactId>bcpkix-jdk15on</artifactId>
-          <version>1.67</version>
+          <version>1.68</version>
       </dependency>
       <dependency>
           <groupId>ch.qos.logback</groupId>
