@@ -21,8 +21,8 @@ import net.zyclonite.nassh.util.AuthSessionManager;
 import net.zyclonite.nassh.util.Constants;
 import net.zyclonite.nassh.util.RequestHelper;
 import net.zyclonite.nassh.util.WebHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -33,7 +33,7 @@ import java.util.Scanner;
  */
 public class CookieHandler implements Handler<RoutingContext> {
 
-    private static Logger logger = LoggerFactory.getLogger(CookieHandler.class);
+    private static Logger logger = LogManager.getLogger();
     private static final String STATIC_FILE = "/webroot/auth.html";
     private final boolean authentication;
     private final boolean secureCookie;
@@ -49,7 +49,7 @@ public class CookieHandler implements Handler<RoutingContext> {
 
     @Override
     public void handle(final RoutingContext context) {
-        logger.debug("got request");
+        logger.debug(() -> "got request");
         final HttpServerRequest request = context.request();
         final HttpServerResponse response = context.response();
         response.putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");

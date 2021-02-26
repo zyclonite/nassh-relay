@@ -18,8 +18,8 @@ import io.vertx.core.shareddata.LocalMap;
 import io.vertx.ext.web.RoutingContext;
 import net.zyclonite.nassh.model.Session;
 import net.zyclonite.nassh.util.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Base64;
 import java.util.UUID;
@@ -29,7 +29,7 @@ import java.util.UUID;
  */
 public class ReadHandler implements Handler<RoutingContext> {
 
-    private static Logger logger = LoggerFactory.getLogger(ReadHandler.class);
+    private static Logger logger = LogManager.getLogger();
     private final Vertx vertx;
 
     public ReadHandler(final Vertx vertx) {
@@ -47,7 +47,7 @@ public class ReadHandler implements Handler<RoutingContext> {
             final LocalMap<String, Session> map = vertx.sharedData().getLocalMap(Constants.SESSIONS);
             final Session session = map.get(sid.toString());
             if (session == null) {
-                logger.warn("could not find valid session for " + sid);
+                logger.warn(() -> "could not find valid session for " + sid);
                 response.setStatusCode(410);
                 response.end();
                 return;
@@ -58,7 +58,7 @@ public class ReadHandler implements Handler<RoutingContext> {
             try {
                 queue = QueueFactory.getQueue(sid.toString());
             } catch (NoSuchQueueException ex) {
-                logger.warn(ex.getMessage(), ex.fillInStackTrace());
+                logger.warn(() -> ex);
                 response.setStatusCode(410);
                 response.end();
                 return;

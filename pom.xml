@@ -20,6 +20,7 @@
 
   <properties>
       <vertx.version>4.0.2</vertx.version>
+      <log4j.version>2.14.0</log4j.version>
       <vertx.main>${project.groupId}.MainVerticle</vertx.main>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -51,9 +52,9 @@
           <artifactId>vertx-auth-oauth2</artifactId>
       </dependency>
       <dependency>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-classic</artifactId>
-          <version>1.2.3</version>
+          <groupId>org.apache.logging.log4j</groupId>
+          <artifactId>log4j-core</artifactId>
+          <version>${log4j.version}</version>
       </dependency>
       <dependency>
           <groupId>io.vertx</groupId>
@@ -110,6 +111,7 @@
                                       <manifestEntries>
                                           <Main-Class>io.vertx.core.Launcher</Main-Class>
                                           <Main-Verticle>${vertx.main}</Main-Verticle>
+                                          <Multi-Release>true</Multi-Release>
                                       </manifestEntries>
                                   </transformer>
                               </transformers>

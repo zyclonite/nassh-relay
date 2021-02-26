@@ -24,8 +24,8 @@ import io.vertx.ext.web.RoutingContext;
 import net.zyclonite.nassh.model.AuthSession;
 import net.zyclonite.nassh.model.Session;
 import net.zyclonite.nassh.util.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.InetAddress;
 import java.util.UUID;
@@ -35,7 +35,7 @@ import java.util.UUID;
  */
 public class ProxyHandler implements Handler<RoutingContext> {
 
-    private static Logger logger = LoggerFactory.getLogger(ProxyHandler.class);
+    private static Logger logger = LogManager.getLogger();
     private final LocalMap<String, Session> sessions;
     private final int sessionlimit;
     private final boolean authentication;
@@ -58,7 +58,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
 
     @Override
     public void handle(final RoutingContext context) {
-        logger.debug("got request");
+        logger.debug(() -> "got request");
         final HttpServerRequest request = context.request();
         final HttpServerResponse response = context.response();
         response.putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
@@ -81,7 +81,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
             if (sessions.size() >= sessionlimit) {
                 response.setStatusCode(410);
                 response.end("session limit reached");
-                logger.warn("ssh session limit of " + sessionlimit + " reached");
+                logger.warn(() -> "ssh session limit of " + sessionlimit + " reached");
                 return;
             }
             ((VertxImpl) vertx).resolveAddress(host, result -> {
@@ -95,7 +95,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
                             if (!res.result()) {
                                 response.setStatusCode(410);
                                 response.end("host not allowed");
-                                logger.warn("client " + clienthost + " " + (authSession == null ? "" : "(" + authSession + ")") + " tried to access " + address.getHostAddress() + " but was not allowed");
+                                logger.warn(() -> "client " + clienthost + " " + (authSession == null ? "" : "(" + authSession + ")") + " tried to access " + address.getHostAddress() + " but was not allowed");
                             } else {
                                 connectTcpEndpoint(sid, address.getHostAddress(), port, clienthost).future().onComplete(ar -> {
                                     if (ar.succeeded()) {
@@ -108,7 +108,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
                                 });
                             }
                         } else {
-                            logger.error(res.cause().getMessage(), res.cause());
+                            logger.error(res::cause);
                             response.setStatusCode(500);
                             response.end("internal server error");
                         }
@@ -129,7 +129,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
         final NetClient client = vertx.createNetClient(new NetClientOptions().setReconnectAttempts(10).setReconnectInterval(500));
         client.connect(port, host, asyncResult -> {
             if (asyncResult.succeeded()) {
-                logger.info("Connected to ssh server: " + host + ":" + port + " (" + clienthost + ")");
+                logger.info(() -> "Connected to ssh server: " + host + ":" + port + " (" + clienthost + ")");
                 QueueFactory.createQueue(sid.toString());
                 asyncResult.result().drainHandler(v -> asyncResult.result().resume());
                 asyncResult.result().handler(buffer -> {
@@ -141,11 +141,11 @@ public class ProxyHandler implements Handler<RoutingContext> {
                             asyncResult.result().pause();
                         }
                     } catch (NoSuchQueueException ex) {
-                        logger.warn(ex.getMessage(), ex.fillInStackTrace());
+                        logger.warn(() -> ex);
                     }
                 });
                 asyncResult.result().closeHandler(v -> {
-                    logger.info("ssh server connection closed " + host + ":" + port);
+                    logger.info(() -> "ssh server connection closed " + host + ":" + port);
                     QueueFactory.deleteQueue(sid.toString());
                     sessions.remove(sid.toString());
                 });
@@ -156,7 +156,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
                 promise.complete(sid);
             } else {
                 promise.fail(asyncResult.cause());
-                logger.warn("Could not connect to ssh server: " + asyncResult.cause().getMessage(), asyncResult.cause());
+                logger.warn(() -> "Could not connect to ssh server: " + asyncResult.cause().getMessage(), asyncResult.cause());
             }
         });
         return promise;

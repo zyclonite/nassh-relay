@@ -18,24 +18,24 @@ import io.vertx.core.net.SelfSignedCertificate;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.CorsHandler;
 import net.zyclonite.nassh.handler.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @SuppressWarnings("unused")
 public class MainVerticle extends AbstractVerticle {
-    private static Logger logger = LoggerFactory.getLogger(MainVerticle.class);
+    private static Logger logger = LogManager.getLogger();
     private HttpServer server;
 
     @Override
     public void start(final Promise<Void> startPromise) {
         final JsonObject webserviceConfig = config().getJsonObject("webservice");
         if (webserviceConfig.containsKey("hostname")) {
-            logger.warn("webservice.hostname will be deprecated in future releases, please use webservice.host instead");
+            logger.warn(() -> "webservice.hostname will be deprecated in future releases, please use webservice.host instead");
             webserviceConfig.put("host", webserviceConfig.getString("hostname", webserviceConfig.getString("host")));
         }
         final HttpServerOptions options = new HttpServerOptions(webserviceConfig);
         if (options.isSsl() && options.getKeyCertOptions() == null) {
-            logger.warn("no certificate configured, creating self-signed");
+            logger.warn(() -> "no certificate configured, creating self-signed");
             final SelfSignedCertificate certificate = SelfSignedCertificate.create();
             options.setKeyCertOptions(certificate.keyCertOptions());
             options.setTrustOptions(certificate.trustOptions());
@@ -55,7 +55,7 @@ public class MainVerticle extends AbstractVerticle {
         server.webSocketHandler(new ConnectHandler(vertx));
         server.listen(result -> {
                 if (result.succeeded()) {
-                    logger.info("nassh-relay listening on port " + result.result().actualPort());
+                    logger.info(() -> "nassh-relay listening on port " + result.result().actualPort());
                     startPromise.complete();
                 } else {
                     startPromise.fail(result.cause());
@@ -66,7 +66,7 @@ public class MainVerticle extends AbstractVerticle {
 
     @Override
     public void stop(final Promise<Void> stopPromise) {
-        logger.debug("stopped");
+        logger.debug(() -> "stopped");
         if (server != null) {
             server.close(complete -> stopPromise.complete());
         } else {

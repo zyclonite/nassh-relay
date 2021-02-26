@@ -23,8 +23,8 @@ import io.vertx.ext.web.RoutingContext;
 import net.zyclonite.nassh.model.AuthSession;
 import net.zyclonite.nassh.util.AuthSessionManager;
 import net.zyclonite.nassh.util.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.UUID;
 
@@ -33,7 +33,7 @@ import java.util.UUID;
  */
 public class CookiePostHandler implements Handler<RoutingContext> {
 
-    private static Logger logger = LoggerFactory.getLogger(CookiePostHandler.class);
+    private static Logger logger = LogManager.getLogger();
     private final OAuth2Auth oauth2;
 
     public CookiePostHandler(final Vertx vertx, final JsonObject config) {
@@ -43,7 +43,7 @@ public class CookiePostHandler implements Handler<RoutingContext> {
 
     @Override
     public void handle(final RoutingContext context) {
-        logger.debug("got request");
+        logger.debug(() -> "got request");
         final HttpServerRequest request = context.request();
         final HttpServerResponse response = context.response();
         response.putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
@@ -88,7 +88,7 @@ public class CookiePostHandler implements Handler<RoutingContext> {
                     final String email = idToken.getString("email");
                     final String hostedDomain = idToken.getString("hd");
 
-                    logger.info("Google User: id: " + id + " email: " + email + " domain: " + hostedDomain + " logged in");
+                    logger.info(() -> "Google User: id: " + id + " email: " + email + " domain: " + hostedDomain + " logged in");
                     session.put("token", user.principal().getString("access_token"));
                     session.put("id", id);
                     session.put("email", email);

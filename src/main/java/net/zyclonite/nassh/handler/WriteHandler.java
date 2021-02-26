@@ -18,8 +18,8 @@ import io.vertx.core.shareddata.LocalMap;
 import io.vertx.ext.web.RoutingContext;
 import net.zyclonite.nassh.model.Session;
 import net.zyclonite.nassh.util.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Base64;
 import java.util.UUID;
@@ -29,7 +29,7 @@ import java.util.UUID;
  */
 public class WriteHandler implements Handler<RoutingContext> {
 
-    private static Logger logger = LoggerFactory.getLogger(WriteHandler.class);
+    private static Logger logger = LogManager.getLogger();
     private final Vertx vertx;
 
     public WriteHandler(final Vertx vertx) {

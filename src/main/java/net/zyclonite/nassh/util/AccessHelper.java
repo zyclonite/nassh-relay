@@ -12,8 +12,8 @@ package net.zyclonite.nassh.util;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import net.zyclonite.nassh.model.AuthSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -23,7 +23,7 @@ import java.net.UnknownHostException;
  */
 public class AccessHelper {
 
-    private static Logger logger = LoggerFactory.getLogger(AccessHelper.class);
+    private static Logger logger = LogManager.getLogger();
 
     public static boolean isHostAllowed(final JsonArray accesslist, final JsonArray whitelist, final JsonArray blacklist, final InetAddress address, final AuthSession authSession) {
         if (authSession != null) {
@@ -82,7 +82,7 @@ public class AccessHelper {
                 return true;
             }
         } catch (final UnknownHostException ex) {
-            logger.warn("Configuration error at " + block + " " + ex);
+            logger.warn(() -> "Configuration error at " + block + " " + ex);
         }
         return false;
     }
@@ -94,7 +94,7 @@ public class AccessHelper {
                 return true;
             }
         } catch (final UnknownHostException ex) {
-            logger.warn("Configuration error at " + block + " " + ex);
+            logger.warn(() -> "Configuration error at " + block + " " + ex);
         }
         return false;
     }

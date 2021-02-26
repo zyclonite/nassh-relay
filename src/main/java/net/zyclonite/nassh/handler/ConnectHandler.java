@@ -18,8 +18,8 @@ import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.shareddata.LocalMap;
 import net.zyclonite.nassh.model.Session;
 import net.zyclonite.nassh.util.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ import java.util.UUID;
  */
 public class ConnectHandler implements Handler<ServerWebSocket> {
 
-    private static Logger logger = LoggerFactory.getLogger(ConnectHandler.class);
+    private static Logger logger = LogManager.getLogger();
     private final Vertx vertx;
 
     public ConnectHandler(final Vertx vertx) {
@@ -56,7 +56,7 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
             try {
                 queue = QueueFactory.getQueue(sid.toString());
             } catch (final NoSuchQueueException ex) {
-                logger.warn(ex.getMessage(), ex.fillInStackTrace());
+                logger.warn(() -> ex);
                 ws.reject();
                 ws.close();
                 return;
@@ -76,7 +76,7 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
                     ws.pause();
                 }
             }
-            logger.debug("connected");
+            logger.debug(() -> "connected");
             ws.drainHandler(v -> ws.resume());
             ws.handler(data -> {
                 if (!session.isActive()) {
@@ -84,7 +84,7 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
                     return;
                 }
                 if (data.length() < 4) {
-                    logger.warn("wrong frame format");
+                    logger.warn(() -> "wrong frame format");
                     return;
                 }
                 session.setWrite_count(session.getWrite_count() + data.length() - 4);
@@ -92,7 +92,7 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
             });
             ws.closeHandler(v -> {
                 queue.deleteObservers();
-                logger.debug("disconnected");
+                logger.debug(() -> "disconnected");
             });
         } else {
             ws.reject();
