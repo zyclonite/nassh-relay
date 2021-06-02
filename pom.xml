@@ -4,7 +4,7 @@
 
   <groupId>net.zyclonite.nassh</groupId>
   <artifactId>nassh-relay</artifactId>
-  <version>1.1.10</version>
+  <version>1.1.11</version>
 
   <organization>
       <name>zyclonite networx</name>
@@ -19,7 +19,7 @@
   </developers>
 
   <properties>
-      <vertx.version>4.0.3</vertx.version>
+      <vertx.version>4.1.0</vertx.version>
       <log4j.version>2.14.1</log4j.version>
       <vertx.main>${project.groupId}.MainVerticle</vertx.main>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

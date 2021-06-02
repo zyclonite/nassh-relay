@@ -78,7 +78,7 @@ public class CookiePostHandler implements Handler<RoutingContext> {
         request.bodyHandler(body -> {
             final JsonObject tokenConfig = new JsonObject()
                 .put("code", body.toString())
-                .put("redirect_uri", "postmessage");
+                .put("redirectUri", "postmessage");
             oauth2.authenticate(tokenConfig, ar -> {
                 if (ar.succeeded() && ar.result() != null) {
                     final User user = ar.result();

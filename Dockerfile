@@ -24,10 +24,7 @@ COPY --from=maven /usr/local/openjdk-11-slim /usr/local/openjdk-11
 
 USER nobody
 
-ENTRYPOINT ["java", \
-            "-Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.SLF4JLogDelegateFactory", \
-            "--illegal-access=deny", "-jar", "nassh-relay-app.jar" \
-]
+ENTRYPOINT ["java", "-jar", "nassh-relay-app.jar" ]
 
 CMD ["-conf", "config.json", "-cp", "."]
 
