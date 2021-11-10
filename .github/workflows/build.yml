@@ -1,0 +1,93 @@
+name: build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  release:
+    types:
+      - created
+
+env:
+  IMAGE_NAME: nassh-relay
+
+jobs:
+  build:
+    name: Build images
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+          architecture: 'x64'
+
+      - name: Build with Maven
+        run: mvn -B verify
+
+      - name: Build Image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: amd64
+          arch: amd64
+          dockerfiles: |
+            ./Dockerfile
+
+      - name: Check images created
+        run: buildah images | grep '${{ env.IMAGE_NAME }}'
+
+      - name: Check image metadata
+        run: |
+          set -x
+          buildah inspect ${{ steps.build_image.outputs.image }}:${{ matrix.arch }} | jq ".OCIv1.architecture"
+          buildah inspect ${{ steps.build_image.outputs.image }}:${{ matrix.arch }} | jq ".Docker.architecture"
+
+      - name: Export image
+        run: podman save -o /tmp/image.tar ${{ steps.build_image.outputs.image }}:amd64
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: image-amd64
+          path: /tmp/image.tar
+
+  push:
+    name: Publish images
+    runs-on: ubuntu-latest
+    needs: build
+    environment: production
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Import images
+        run: |
+          podman load -i ./image-amd64/image.tar
+
+      - name: Create multi-arch manifest
+        run: |
+          buildah manifest create ${{ env.IMAGE_NAME }}:latest
+          buildah manifest add --arch amd64 ${{ env.IMAGE_NAME }}:latest ${{ env.IMAGE_NAME }}:amd64
+
+      - name: Push unstable images
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          buildah manifest push --all --format v2s2 --creds zyclonite:${{ secrets.DOCKERHUB_PASSWORD }} ${{ env.IMAGE_NAME }}:latest docker://docker.io/zyclonite/${{ env.IMAGE_NAME }}:main
+          buildah manifest push --all --creds zyclonite:${{ secrets.QUAY_PASSWORD }} ${{ env.IMAGE_NAME }}:latest docker://quay.io/zyclonite/${{ env.IMAGE_NAME }}:main
+
+      - name: Push stable images
+        if: ${{ github.event_name == 'release' }}
+        run: |
+          buildah manifest push --all --format v2s2 --creds zyclonite:${{ secrets.DOCKERHUB_PASSWORD }} ${{ env.IMAGE_NAME }}:latest docker://docker.io/zyclonite/${{ env.IMAGE_NAME }}:latest
+          buildah manifest push --all --format v2s2 --creds zyclonite:${{ secrets.DOCKERHUB_PASSWORD }} ${{ env.IMAGE_NAME }}:latest docker://docker.io/zyclonite/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name }}
+          buildah manifest push --all --creds zyclonite:${{ secrets.QUAY_PASSWORD }} ${{ env.IMAGE_NAME }}:latest docker://quay.io/zyclonite/${{ env.IMAGE_NAME }}:latest
+          buildah manifest push --all --creds zyclonite:${{ secrets.QUAY_PASSWORD }} ${{ env.IMAGE_NAME }}:latest docker://quay.io/zyclonite/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name }}
