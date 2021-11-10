@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/zyclonite/nassh-relay.svg?style=svg)](https://circleci.com/gh/zyclonite/nassh-relay)
+[![build](https://github.com/zyclonite/nassh-relay/actions/workflows/build.yml/badge.svg)](https://github.com/zyclonite/nassh-relay/actions/workflows/build.yml)
 [![Docker Pulls](https://badgen.net/docker/pulls/zyclonite/nassh-relay)](https://hub.docker.com/r/zyclonite/nassh-relay)
 
 # nassh-relay
