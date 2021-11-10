@@ -25,7 +25,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.Objects;
 import java.util.Scanner;
 
 /**
@@ -33,7 +35,7 @@ import java.util.Scanner;
  */
 public class CookieHandler implements Handler<RoutingContext> {
 
-    private static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
     private static final String STATIC_FILE = "/webroot/auth.html";
     private final boolean authentication;
     private final boolean secureCookie;
@@ -83,7 +85,7 @@ public class CookieHandler implements Handler<RoutingContext> {
                         .setSecure(true);
                 }
                 response.addCookie(sessionCookie);
-                final String auth_html = new Scanner(this.getClass().getResourceAsStream(STATIC_FILE), "UTF-8")
+                final String auth_html = new Scanner(Objects.requireNonNull(this.getClass().getResourceAsStream(STATIC_FILE)), StandardCharsets.UTF_8)
                     .useDelimiter("\\A").next()
                     .replaceAll("[{]{2}\\s*CLIENT_ID\\s*[}]{2}", auth.getString("client-id"))
                     .replaceAll("[{]{2}\\s*STATE\\s*[}]{2}", state)

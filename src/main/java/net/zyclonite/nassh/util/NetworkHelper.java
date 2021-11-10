@@ -21,18 +21,16 @@ import java.util.List;
  */
 public class NetworkHelper {
 
-    private final String cidr;
-    private InetAddress inetAddress;
+    private final InetAddress inetAddress;
     private InetAddress startAddress;
     private InetAddress endAddress;
     private final int prefixLength;
 
     public NetworkHelper(final String cidr) throws UnknownHostException {
-        this.cidr = cidr;
-        if (this.cidr.contains("/")) {
-            final int index = this.cidr.indexOf("/");
-            final String addressPart = this.cidr.substring(0, index);
-            final String networkPart = this.cidr.substring(index + 1);
+        if (cidr.contains("/")) {
+            final int index = cidr.indexOf("/");
+            final String addressPart = cidr.substring(0, index);
+            final String networkPart = cidr.substring(index + 1);
             inetAddress = InetAddress.getByName(addressPart);
             prefixLength = Integer.parseInt(networkPart);
             calculate();

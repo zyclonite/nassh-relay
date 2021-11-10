@@ -43,7 +43,7 @@ public class AuthSession {
     }
 
     public boolean isValid(final long now) {
-        return ((lastAccessed + (ttl * 1000)) < now);
+        return ((lastAccessed + (ttl * 1000L)) < now);
     }
 
     public void refresh() {

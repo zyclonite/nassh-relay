@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class AuthSessionManager {
 
-    private static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
     private final static Map<UUID, AuthSession> STORE = new ConcurrentHashMap<>();
     private static long lastcheck = (new Date()).getTime();
 

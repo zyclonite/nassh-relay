@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class TransferQueue implements Queue<Buffer> {
     private boolean changed = false;
-    private Vector<TransferObserver> obs;
+    private final Vector<TransferObserver> obs;
     private final ConcurrentLinkedQueue<Buffer> queue = new ConcurrentLinkedQueue<>();
 
     public TransferQueue() {

@@ -21,7 +21,7 @@ import java.util.UUID;
 public class WebHelper {
 
     public static AuthSession validateCookie(final RoutingContext context) {
-        final Cookie cookie = context.getCookie(Constants.SESSIONCOOKIE);
+        final Cookie cookie = context.request().getCookie(Constants.SESSIONCOOKIE);
         if (cookie == null) {
             return null;
         }

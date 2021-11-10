@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 @SuppressWarnings("unused")
 public class MainVerticle extends AbstractVerticle {
-    private static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
     private HttpServer server;
 
     @Override

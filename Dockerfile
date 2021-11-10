@@ -1,4 +1,4 @@
-FROM maven:3.6.3-jdk-11-slim as maven
+FROM maven:3.8.3-jdk-11-slim as maven
 
 WORKDIR /src
 

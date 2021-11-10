@@ -33,7 +33,7 @@ import java.util.UUID;
  */
 public class CookiePostHandler implements Handler<RoutingContext> {
 
-    private static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
     private final OAuth2Auth oauth2;
 
     public CookiePostHandler(final Vertx vertx, final JsonObject config) {
@@ -50,7 +50,7 @@ public class CookiePostHandler implements Handler<RoutingContext> {
         response.putHeader("Pragma", "no-cache");
         response.putHeader("Content-Type", "no-cache");
         response.putHeader("Content-Type", "application/json");
-        final Cookie cookie = context.getCookie(Constants.SESSIONCOOKIE);
+        final Cookie cookie = context.request().getCookie(Constants.SESSIONCOOKIE);
         UUID sessioncookie;
         if (cookie == null) {
             sessioncookie = null;

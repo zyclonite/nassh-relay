@@ -35,7 +35,7 @@ import java.util.UUID;
  */
 public class ProxyHandler implements Handler<RoutingContext> {
 
-    private static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
     private final LocalMap<String, Session> sessions;
     private final int sessionlimit;
     private final boolean authentication;

@@ -29,7 +29,7 @@ import java.util.UUID;
  */
 public class ReadHandler implements Handler<RoutingContext> {
 
-    private static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
     private final Vertx vertx;
 
     public ReadHandler(final Vertx vertx) {

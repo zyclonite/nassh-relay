@@ -23,7 +23,7 @@ import java.net.UnknownHostException;
  */
 public class AccessHelper {
 
-    private static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     public static boolean isHostAllowed(final JsonArray accesslist, final JsonArray whitelist, final JsonArray blacklist, final InetAddress address, final AuthSession authSession) {
         if (authSession != null) {
