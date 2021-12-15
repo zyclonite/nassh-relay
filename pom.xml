@@ -20,7 +20,7 @@
 
     <properties>
         <vertx.version>4.2.1</vertx.version>
-        <log4j.version>2.15.0</log4j.version>
+        <log4j.version>2.16.0</log4j.version>
         <vertx.main>${project.groupId}.MainVerticle</vertx.main>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
