@@ -163,7 +163,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
     }
 
     private void registerTimerOut(final Session session, final NetClient client) {
-        vertx.setPeriodic(config.getJsonObject("application").getInteger("tcp-session-timeout", 1200) * 1000, new Handler<Long>() {
+        vertx.setPeriodic(config.getJsonObject("application").getInteger("tcp-session-timeout", 1200) * 1000, new Handler<>() {
             private int readCount = 0;
             private int writeCount = 0;
 
