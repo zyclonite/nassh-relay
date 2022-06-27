@@ -1,4 +1,5 @@
 [![build](https://github.com/zyclonite/nassh-relay/actions/workflows/build.yml/badge.svg)](https://github.com/zyclonite/nassh-relay/actions/workflows/build.yml)
+[![Quay.io Enabled](https://badgen.net/badge/quay%20pulls/enabled/green)](https://quay.io/repository/zyclonite/nassh-relay)
 [![Docker Pulls](https://badgen.net/docker/pulls/zyclonite/nassh-relay)](https://hub.docker.com/r/zyclonite/nassh-relay)
 
 # nassh-relay
