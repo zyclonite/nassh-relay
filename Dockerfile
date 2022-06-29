@@ -1,4 +1,4 @@
-FROM maven:3.8.5-openjdk-17-slim as maven
+FROM maven:3.8.6-openjdk-17-slim as maven
 
 WORKDIR /src
 
