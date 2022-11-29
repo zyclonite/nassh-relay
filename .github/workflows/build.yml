@@ -49,7 +49,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: image-amd64
+          name: image-${{ matrix.platform.tag }}
           path: /tmp/image.tar
 
   push:
