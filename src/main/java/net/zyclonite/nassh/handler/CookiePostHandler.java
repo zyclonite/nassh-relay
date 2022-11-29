@@ -16,8 +16,10 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
+import io.vertx.ext.auth.authentication.Credentials;
 import io.vertx.ext.auth.impl.jose.JWT;
 import io.vertx.ext.auth.oauth2.OAuth2Auth;
+import io.vertx.ext.auth.oauth2.Oauth2Credentials;
 import io.vertx.ext.auth.oauth2.providers.GoogleAuth;
 import io.vertx.ext.web.RoutingContext;
 import net.zyclonite.nassh.model.AuthSession;
@@ -76,10 +78,10 @@ public class CookiePostHandler implements Handler<RoutingContext> {
             return;
         }
         request.bodyHandler(body -> {
-            final JsonObject tokenConfig = new JsonObject()
-                .put("code", body.toString())
-                .put("redirectUri", "postmessage");
-            oauth2.authenticate(tokenConfig, ar -> {
+            final Credentials oauth2Credentials = new Oauth2Credentials()
+                .setCode(body.toString())
+                .setRedirectUri("postmessage");
+            oauth2.authenticate(oauth2Credentials, ar -> {
                 if (ar.succeeded() && ar.result() != null) {
                     final User user = ar.result();
                     final JsonObject idToken = JWT.parse(user.principal().getString("id_token"))
