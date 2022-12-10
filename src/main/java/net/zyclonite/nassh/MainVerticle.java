@@ -43,7 +43,8 @@ public class MainVerticle extends AbstractVerticle {
         server = vertx.createHttpServer(options);
         final Router router = Router.router(vertx);
         router.route().handler(CorsHandler
-            .create(".*")
+            .create()
+            .addRelativeOrigin(".*")
             .allowCredentials(true)
         );
         router.get("/cookie").handler(new CookieHandler(config().getJsonObject("application").copy().put("auth", config().getJsonObject("google-sso"))));
