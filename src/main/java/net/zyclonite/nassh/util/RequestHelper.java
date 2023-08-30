@@ -3,7 +3,7 @@
  *
  * Website: https://github.com/zyclonite/nassh-relay
  *
- * Copyright 2014-2020   zyclonite    networx
+ * Copyright 2014-2023   zyclonite    networx
  *                       http://zyclonite.net
  * Developer: Lukas Prettenthaler
  */
@@ -20,7 +20,7 @@ public class RequestHelper {
         if (request.headers().contains("X-Forwarded-Host")) {
             return request.headers().get("X-Forwarded-Host");
         } else {
-            return request.host();
+            return request.authority().host();
         }
     }
 

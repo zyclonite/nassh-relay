@@ -3,7 +3,7 @@
  *
  * Website: https://github.com/zyclonite/nassh-relay
  *
- * Copyright 2014-2020   zyclonite    networx
+ * Copyright 2014-2023   zyclonite    networx
  *                       http://zyclonite.net
  * Developer: Lukas Prettenthaler
  */
@@ -87,12 +87,9 @@ public class ProxyHandler implements Handler<RoutingContext> {
             ((VertxImpl) vertx).resolveAddress(host, result -> {
                 if (result.succeeded()) {
                     final InetAddress address = result.result();
-                    vertx.<Boolean>executeBlocking(promise -> {
-                        final boolean isAllowed = AccessHelper.isHostAllowed(accessList, whiteList, blackList, address, authSession);
-                        promise.complete(isAllowed);
-                    }, false, res -> {
-                        if (res.succeeded()) {
-                            if (!res.result()) {
+                    vertx.executeBlocking(() -> AccessHelper.isHostAllowed(accessList, whiteList, blackList, address, authSession), false)
+                        .onSuccess(isAllowed -> {
+                            if (!isAllowed) {
                                 response.setStatusCode(410);
                                 response.end("host not allowed");
                                 logger.warn(() -> "client " + clienthost + " " + (authSession == null ? "" : "(" + authSession + ")") + " tried to access " + address.getHostAddress() + " but was not allowed");
@@ -107,12 +104,12 @@ public class ProxyHandler implements Handler<RoutingContext> {
                                     }
                                 });
                             }
-                        } else {
-                            logger.error(res::cause);
+                        })
+                        .onFailure(t -> {
+                            logger.error(t);
                             response.setStatusCode(500);
                             response.end("internal server error");
-                        }
-                    });
+                        });
                 } else {
                     response.setStatusCode(410);
                     response.end("invalid host");
