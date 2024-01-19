@@ -14,7 +14,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
-import io.vertx.core.impl.VertxImpl;
+import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClient;
@@ -39,14 +39,16 @@ public class ProxyHandler implements Handler<RoutingContext> {
     private final LocalMap<String, Session> sessions;
     private final int sessionlimit;
     private final boolean authentication;
-    private final Vertx vertx;
+    private final VertxInternal vertx;
+    private final NetClient client;
     private final JsonObject config;
     private final JsonArray accessList;
     private final JsonArray whiteList;
     private final JsonArray blackList;
 
     public ProxyHandler(final Vertx vertx, final JsonObject config) {
-        this.vertx = vertx;
+        this.vertx = (VertxInternal) vertx;
+        this.client = vertx.createNetClient(new NetClientOptions().setRegisterWriteHandler(true).setReconnectAttempts(10).setReconnectInterval(500));
         this.config = config;
         this.authentication = config.getJsonObject("application").getBoolean("authentication", true);
         this.sessions = vertx.sharedData().getLocalMap(Constants.SESSIONS);
@@ -84,7 +86,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
                 logger.warn(() -> "ssh session limit of " + sessionlimit + " reached");
                 return;
             }
-            ((VertxImpl) vertx).resolveAddress(host, result -> {
+            vertx.resolveAddress(host, result -> {
                 if (result.succeeded()) {
                     final InetAddress address = result.result();
                     vertx.executeBlocking(() -> AccessHelper.isHostAllowed(accessList, whiteList, blackList, address, authSession), false)
@@ -123,7 +125,6 @@ public class ProxyHandler implements Handler<RoutingContext> {
 
     private Promise<UUID> connectTcpEndpoint(final UUID sid, final String host, final int port, final String clienthost) {
         final Promise<UUID> promise = Promise.promise();
-        final NetClient client = vertx.createNetClient(new NetClientOptions().setReconnectAttempts(10).setReconnectInterval(500));
         client.connect(port, host, asyncResult -> {
             if (asyncResult.succeeded()) {
                 logger.info(() -> "Connected to ssh server: " + host + ":" + port + " (" + clienthost + ")");
