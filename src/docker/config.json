@@ -2,7 +2,11 @@
   "webservice":{
     "host":"0.0.0.0",
     "port":8022,
-    "ssl":false
+      "ssl": false,
+      "cors-relative-origins": [
+          "chrome-extension://[a-p]{32}",
+          "(https|http)://.*"
+      ]
   },
   "application":{
     "authentication":false,

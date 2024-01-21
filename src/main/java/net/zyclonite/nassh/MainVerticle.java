@@ -13,6 +13,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.SelfSignedCertificate;
 import io.vertx.ext.web.Router;
@@ -42,11 +43,12 @@ public class MainVerticle extends AbstractVerticle {
         }
         server = vertx.createHttpServer(options);
         final Router router = Router.router(vertx);
-        router.route().handler(CorsHandler
-            .create()
-            .addRelativeOrigin(".*")
-            .allowCredentials(true)
-        );
+        CorsHandler corsHandler = CorsHandler.create().allowCredentials(true);
+        JsonArray relOrigins = webserviceConfig.getJsonArray("cors-relative-origins");
+        for (int i = 0; i < relOrigins.size(); i++) {
+            corsHandler.addRelativeOrigin(relOrigins.getString(i));
+        }
+        router.route().handler(corsHandler);
         router.get("/cookie").handler(new CookieHandler(config().getJsonObject("application").copy().put("auth", config().getJsonObject("google-sso"))));
         router.post("/cookie").handler(new CookiePostHandler(vertx, new JsonObject().put("auth", config().getJsonObject("google-sso"))));
         router.get("/proxy").handler(new ProxyHandler(vertx, config()));
