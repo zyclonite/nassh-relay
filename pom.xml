@@ -19,7 +19,7 @@
     </developers>
 
     <properties>
-        <vertx.version>4.5.7</vertx.version>
+        <vertx.version>4.5.8</vertx.version>
         <log4j2.version>2.23.1</log4j2.version>
         <vertx.main>${project.groupId}.MainVerticle</vertx.main>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -92,7 +92,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.6.0</version>
                 <configuration>
                     <filters>
                         <filter>
