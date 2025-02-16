@@ -12,7 +12,6 @@ on:
 
 env:
   IMAGE_NAME: nassh-relay
-  STORAGE_DRIVER: overlay
 
 jobs:
   build:
