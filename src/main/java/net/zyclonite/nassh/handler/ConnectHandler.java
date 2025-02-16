@@ -46,7 +46,7 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
             final LocalMap<String, Session> map = vertx.sharedData().getLocalMap(Constants.SESSIONS);
             final Session session = map.get(sid.toString());
             if (session == null || !session.isActive()) {
-                ws.reject();
+                ws.close();
                 return;
             }
             session.setRead_count(Integer.parseInt(params.get("ack")));
@@ -57,7 +57,6 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
                 queue = QueueFactory.getQueue(sid.toString());
             } catch (final NoSuchQueueException ex) {
                 logger.warn(() -> ex);
-                ws.reject();
                 ws.close();
                 return;
             }
@@ -95,7 +94,7 @@ public class ConnectHandler implements Handler<ServerWebSocket> {
                 logger.debug(() -> "disconnected");
             });
         } else {
-            ws.reject();
+            ws.close();
         }
     }
 
