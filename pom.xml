@@ -4,7 +4,7 @@
 
     <groupId>net.zyclonite.nassh</groupId>
     <artifactId>nassh-relay</artifactId>
-    <version>1.1.37</version>
+    <version>1.1.38</version>
 
     <organization>
         <name>zyclonite networx</name>
@@ -19,7 +19,7 @@
     </developers>
 
     <properties>
-        <vertx.version>4.5.14</vertx.version>
+        <vertx.version>5.0.0</vertx.version>
         <log4j.version>2.24.3</log4j.version>
         <vertx.main>${project.groupId}.MainVerticle</vertx.main>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -46,6 +46,10 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-launcher-application</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
@@ -127,7 +131,7 @@
                                 <transformer
                                     implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>io.vertx.core.Launcher</Main-Class>
+                                        <Main-Class>io.vertx.launcher.application.VertxApplication</Main-Class>
                                         <Main-Verticle>${vertx.main}</Main-Verticle>
                                         <Multi-Release>true</Multi-Release>
                                     </manifestEntries>

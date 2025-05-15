@@ -81,7 +81,7 @@ public class CookiePostHandler implements Handler<RoutingContext> {
             final Credentials oauth2Credentials = new Oauth2Credentials()
                 .setCode(body.toString())
                 .setRedirectUri("postmessage");
-            oauth2.authenticate(oauth2Credentials, ar -> {
+            oauth2.authenticate(oauth2Credentials).andThen(ar -> {
                 if (ar.succeeded() && ar.result() != null) {
                     final User user = ar.result();
                     final JsonObject idToken = JWT.parse(user.principal().getString("id_token"))

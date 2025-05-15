@@ -46,7 +46,7 @@ public class MainVerticle extends AbstractVerticle {
         CorsHandler corsHandler = CorsHandler.create().allowCredentials(true);
         JsonArray relOrigins = webserviceConfig.getJsonArray("cors-relative-origins");
         for (int i = 0; i < relOrigins.size(); i++) {
-            corsHandler.addRelativeOrigin(relOrigins.getString(i));
+            corsHandler.addOriginWithRegex(relOrigins.getString(i));
         }
         router.route().handler(corsHandler);
         router.get("/cookie").handler(new CookieHandler(config().getJsonObject("application").copy().put("auth", config().getJsonObject("google-sso"))));
@@ -56,7 +56,7 @@ public class MainVerticle extends AbstractVerticle {
         router.get("/read").handler(new ReadHandler(vertx));
         server.requestHandler(router);
         server.webSocketHandler(new ConnectHandler(vertx));
-        server.listen(result -> {
+        server.listen().andThen(result -> {
                 if (result.succeeded()) {
                     logger.info(() -> "nassh-relay listening on port " + result.result().actualPort());
                     startPromise.complete();
@@ -71,7 +71,7 @@ public class MainVerticle extends AbstractVerticle {
     public void stop(final Promise<Void> stopPromise) {
         logger.debug(() -> "stopped");
         if (server != null) {
-            server.close(complete -> stopPromise.complete());
+            server.close().andThen(complete -> stopPromise.complete());
         } else {
             stopPromise.complete();
         }

@@ -14,7 +14,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
-import io.vertx.core.impl.VertxInternal;
+import io.vertx.core.internal.VertxInternal;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClient;
@@ -86,7 +86,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
                 logger.warn(() -> "ssh session limit of " + sessionlimit + " reached");
                 return;
             }
-            vertx.resolveAddress(host, result -> {
+            vertx.nameResolver().resolve(host).andThen(result -> {
                 if (result.succeeded()) {
                     final InetAddress address = result.result();
                     vertx.executeBlocking(() -> AccessHelper.isHostAllowed(accessList, whiteList, blackList, address, authSession), false)
@@ -125,7 +125,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
 
     private Promise<UUID> connectTcpEndpoint(final UUID sid, final String host, final int port, final String clienthost) {
         final Promise<UUID> promise = Promise.promise();
-        client.connect(port, host, asyncResult -> {
+        client.connect(port, host).andThen(asyncResult -> {
             if (asyncResult.succeeded()) {
                 logger.info(() -> "Connected to ssh server: " + host + ":" + port + " (" + clienthost + ")");
                 QueueFactory.createQueue(sid.toString());
