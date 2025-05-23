@@ -26,6 +26,6 @@ USER nobody
 
 ENTRYPOINT ["java", "-jar", "nassh-relay-app.jar" ]
 
-CMD ["-conf", "config.json", "-cp", "."]
+CMD ["-conf", "config.json"]
 
 EXPOSE 8022
