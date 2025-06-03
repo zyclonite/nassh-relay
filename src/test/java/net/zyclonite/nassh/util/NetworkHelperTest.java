@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NetworkHelperTest {
     @Test
-    public void testWholeIP4Range() throws UnknownHostException {
+    void testWholeIP4Range() throws UnknownHostException {
         NetworkHelper nwh = new NetworkHelper("0.0.0.0/0");
         assertTrue(nwh.isInRange(InetAddress.getByName("0.0.0.0")));
         assertTrue(nwh.isInRange(InetAddress.getByName("0.0.0.1")));
@@ -25,7 +25,7 @@ public class NetworkHelperTest {
     }
 
     @Test
-    public void testLocal192IP4Range() throws UnknownHostException {
+    void testLocal192IP4Range() throws UnknownHostException {
         NetworkHelper nwh = new NetworkHelper("192.168.0.0/16");
         assertFalse(nwh.isInRange(InetAddress.getByName("0.0.0.0")));
         assertFalse(nwh.isInRange(InetAddress.getByName("0.0.0.1")));
@@ -40,7 +40,7 @@ public class NetworkHelperTest {
     }
 
     @Test
-    public void testLocal172IP4Range() throws UnknownHostException {
+    void testLocal172IP4Range() throws UnknownHostException {
         NetworkHelper nwh = new NetworkHelper("172.16.0.0/16");
         assertFalse(nwh.isInRange(InetAddress.getByName("0.0.0.0")));
         assertFalse(nwh.isInRange(InetAddress.getByName("0.0.0.1")));
@@ -55,7 +55,7 @@ public class NetworkHelperTest {
     }
 
     @Test
-    public void testLocal10IP4Range() throws UnknownHostException {
+    void testLocal10IP4Range() throws UnknownHostException {
         NetworkHelper nwh = new NetworkHelper("10.0.0.0/8");
         assertFalse(nwh.isInRange(InetAddress.getByName("0.0.0.0")));
         assertFalse(nwh.isInRange(InetAddress.getByName("0.0.0.1")));

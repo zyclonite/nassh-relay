@@ -58,7 +58,7 @@ public class MainVerticle extends AbstractVerticle {
         server.webSocketHandler(new ConnectHandler(vertx));
         server.listen().andThen(result -> {
                 if (result.succeeded()) {
-                    logger.info(() -> "nassh-relay listening on port " + result.result().actualPort());
+                    logger.info(() -> "nassh-relay listening on port " + result.result().actualPort() + (vertx.isNativeTransportEnabled() ? " (native-transport)" : ""));
                     startPromise.complete();
                 } else {
                     startPromise.fail(result.cause());
