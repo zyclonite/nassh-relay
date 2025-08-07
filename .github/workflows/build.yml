@@ -16,22 +16,17 @@ env:
 jobs:
   build:
     name: Build images
-    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
         platform: [
-          {name: "linux/amd64", tag: "amd64", jdk: "x64"},
-          {name: "linux/arm64/v8", tag: "arm64v8", jdk: "aarch64"}
+          {name: "linux/amd64", tag: "amd64", jdk: "x64", runner: "ubuntu-24.04"},
+          {name: "linux/arm64/v8", tag: "arm64v8", jdk: "aarch64", runner: "ubuntu-24.04-arm"}
         ]
+    runs-on: ${{ matrix.platform.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Install qemu dependency
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y qemu-user-static
 
       - name: Build Image
         run: buildah bud --platform ${{ matrix.platform.name }} -f ./Dockerfile -t ${{ env.IMAGE_NAME }}:${{ matrix.platform.tag }} .
