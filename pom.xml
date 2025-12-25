@@ -19,8 +19,8 @@
     </developers>
 
     <properties>
-        <vertx.version>5.0.3</vertx.version>
-        <log4j.version>2.25.1</log4j.version>
+        <vertx.version>5.0.6</vertx.version>
+        <log4j.version>2.25.3</log4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -126,7 +126,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+                <version>3.14.1</version>
                 <configuration>
                     <source>11</source>
                     <target>11</target>
@@ -139,7 +139,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.6.1</version>
                 <configuration>
                     <filters>
                         <filter>
@@ -154,7 +154,7 @@
                                 <exclude>META-INF/LICENSE</exclude>
                                 <exclude>META-INF/NOTICE</exclude>
                                 <exclude>META-INF/DEPENDENCIES</exclude>
-                                <exclude>META-INF/versions/9/module-info.class</exclude>
+                                <exclude>META-INF/versions/*/module-info.class</exclude>
                             </excludes>
                         </filter>
                     </filters>
