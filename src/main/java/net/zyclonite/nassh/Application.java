@@ -8,8 +8,8 @@ import io.vertx.launcher.application.VertxApplicationHooks;
 import java.util.function.Supplier;
 
 public class Application {
-    public static void main(String[] args) {
-        VertxApplication vertxApplication = new VertxApplication(args, new VertxApplicationHooks() {
+    static void main(String[] args) {
+        var vertxApplication = new VertxApplication(args, new VertxApplicationHooks() {
             @Override
             public void beforeStartingVertx(HookContext context) {
                 context.vertxOptions().setPreferNativeTransport(true);

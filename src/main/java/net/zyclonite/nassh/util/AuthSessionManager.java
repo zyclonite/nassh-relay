@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,7 +29,7 @@ public class AuthSessionManager {
 
     public static AuthSession createSession(final int ttl) {
         checkExpiration();
-        final AuthSession session = new AuthSession(ttl);
+        var session = new AuthSession(ttl);
         STORE.put(session.getId(), session);
         return session;
     }
@@ -38,7 +37,7 @@ public class AuthSessionManager {
     public static AuthSession getSession(final UUID id) {
         checkExpiration();
         if ((id != null) && (STORE.containsKey(id))) {
-            final AuthSession session = STORE.get(id);
+            var session = STORE.get(id);
             session.refresh();
             return session;
         } else {
@@ -51,14 +50,14 @@ public class AuthSessionManager {
     }
 
     private static void checkExpiration() {
-        final long now = (new Date()).getTime();
+        var now = (new Date()).getTime();
         logger.debug(() -> now + " " + lastcheck);
         if (lastcheck + (10 * 1000) > now) {
             return;
         }
-        for (final Entry<UUID, AuthSession> set : STORE.entrySet()) {
+        for (var set : STORE.entrySet()) {
             if (set.getValue().isValid(now)) {
-                final UUID key = set.getKey();
+                var key = set.getKey();
                 logger.debug(() -> "Removed session " + key);
                 removeSession(key);
             }

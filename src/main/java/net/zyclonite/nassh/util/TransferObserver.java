@@ -30,19 +30,17 @@ public class TransferObserver {
     }
 
     public void update(final TransferQueue queue) {
-        if (request instanceof HttpServerRequest) {
-            final Buffer buffer = queue.poll();
+        if (request instanceof HttpServerRequest req) {
+            var buffer = queue.poll();
             queue.deleteObserver(this);
-            final HttpServerRequest req = (HttpServerRequest) request;
             assert buffer != null;
-            final String encodedBytes = Base64.getUrlEncoder().encodeToString(buffer.getBytes());
+            var encodedBytes = Base64.getUrlEncoder().encodeToString(buffer.getBytes());
             req.response().setStatusCode(200);
             req.response().end(encodedBytes);
-        } else if (request instanceof ServerWebSocket) {
-            final Buffer buffer = queue.poll();
-            final ServerWebSocket ws = (ServerWebSocket) request;
+        } else if (request instanceof ServerWebSocket ws) {
+            var buffer = queue.poll();
             if (!ws.writeQueueFull()) {
-                final Buffer ackbuffer = Buffer.buffer();
+                var ackbuffer = Buffer.buffer();
                 ackbuffer.setInt(0, session.getWrite_count());
                 ackbuffer.setBuffer(4, buffer);
                 ws.write(ackbuffer);

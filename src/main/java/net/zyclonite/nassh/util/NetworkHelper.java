@@ -14,7 +14,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author zyclonite
@@ -28,9 +27,9 @@ public class NetworkHelper {
 
     public NetworkHelper(final String cidr) throws UnknownHostException {
         if (cidr.contains("/")) {
-            final int index = cidr.indexOf("/");
-            final String addressPart = cidr.substring(0, index);
-            final String networkPart = cidr.substring(index + 1);
+            var index = cidr.indexOf("/");
+            var addressPart = cidr.substring(0, index);
+            var networkPart = cidr.substring(index + 1);
             inetAddress = InetAddress.getByName(addressPart);
             prefixLength = Integer.parseInt(networkPart);
             calculate();
@@ -49,50 +48,42 @@ public class NetworkHelper {
             maskBuffer = ByteBuffer.allocate(16).putLong(-1L).putLong(-1L);
             targetSize = 16;
         }
-        final BigInteger mask = (new BigInteger(1, maskBuffer.array())).not().shiftRight(prefixLength);
-        final ByteBuffer buffer = ByteBuffer.wrap(inetAddress.getAddress());
-        final BigInteger ipVal = new BigInteger(1, buffer.array());
-        final BigInteger startIp = ipVal.and(mask);
-        final BigInteger endIp = startIp.add(mask.not());
-        final byte[] startIpArr = toBytes(startIp.toByteArray(), targetSize);
-        final byte[] endIpArr = toBytes(endIp.toByteArray(), targetSize);
+        var mask = (new BigInteger(1, maskBuffer.array())).not().shiftRight(prefixLength);
+        var buffer = ByteBuffer.wrap(inetAddress.getAddress());
+        var ipVal = new BigInteger(1, buffer.array());
+        var startIp = ipVal.and(mask);
+        var endIp = startIp.add(mask.not());
+        var startIpArr = toBytes(startIp.toByteArray(), targetSize);
+        var endIpArr = toBytes(endIp.toByteArray(), targetSize);
         this.startAddress = InetAddress.getByAddress(startIpArr);
         this.endAddress = InetAddress.getByAddress(endIpArr);
 
     }
 
     private byte[] toBytes(final byte[] array, final int targetSize) {
-        int counter = 0;
-        final List<Byte> newArr = new ArrayList<>();
+        var counter = 0;
+        var newArr = new ArrayList<Byte>();
         while (counter < targetSize && (array.length - 1 - counter >= 0)) {
-            newArr.add(0, array[array.length - 1 - counter]);
+            newArr.addFirst(array[array.length - 1 - counter]);
             counter++;
         }
-        final int size = newArr.size();
-        for (int i = 0; i < (targetSize - size); i++) {
-            newArr.add(0, (byte) 0);
+        var size = newArr.size();
+        for (var i = 0; i < (targetSize - size); i++) {
+            newArr.addFirst((byte) 0);
         }
-        final byte[] ret = new byte[newArr.size()];
-        for (int i = 0; i < newArr.size(); i++) {
+        var ret = new byte[newArr.size()];
+        for (var i = 0; i < newArr.size(); i++) {
             ret[i] = newArr.get(i);
         }
         return ret;
     }
 
-    public String getNetworkAddress() {
-        return this.startAddress.getHostAddress();
-    }
-
-    public String getBroadcastAddress() {
-        return this.endAddress.getHostAddress();
-    }
-
     public boolean isInRange(final InetAddress address) {
-        final BigInteger start = new BigInteger(1, this.startAddress.getAddress());
-        final BigInteger end = new BigInteger(1, this.endAddress.getAddress());
-        final BigInteger target = new BigInteger(1, address.getAddress());
-        final int st = start.compareTo(target);
-        final int te = target.compareTo(end);
+        var start = new BigInteger(1, this.startAddress.getAddress());
+        var end = new BigInteger(1, this.endAddress.getAddress());
+        var target = new BigInteger(1, address.getAddress());
+        var st = start.compareTo(target);
+        var te = target.compareTo(end);
         return (st < 0 || st == 0) && (te < 0 || te == 0);
     }
 }

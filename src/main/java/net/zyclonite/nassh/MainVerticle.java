@@ -13,7 +13,6 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.SelfSignedCertificate;
 import io.vertx.ext.web.Router;
@@ -29,22 +28,22 @@ public class MainVerticle extends AbstractVerticle {
 
     @Override
     public void start(final Promise<Void> startPromise) {
-        final JsonObject webserviceConfig = config().getJsonObject("webservice");
+        var webserviceConfig = config().getJsonObject("webservice");
         if (webserviceConfig.containsKey("hostname")) {
             logger.warn(() -> "webservice.hostname will be deprecated in future releases, please use webservice.host instead");
             webserviceConfig.put("host", webserviceConfig.getString("hostname", webserviceConfig.getString("host")));
         }
-        final HttpServerOptions options = new HttpServerOptions(webserviceConfig);
+        var options = new HttpServerOptions(webserviceConfig);
         if (options.isSsl() && options.getKeyCertOptions() == null) {
             logger.warn(() -> "no certificate configured, creating self-signed");
-            final SelfSignedCertificate certificate = SelfSignedCertificate.create();
+            var certificate = SelfSignedCertificate.create();
             options.setKeyCertOptions(certificate.keyCertOptions());
             options.setTrustOptions(certificate.trustOptions());
         }
         server = vertx.createHttpServer(options);
-        final Router router = Router.router(vertx);
-        CorsHandler corsHandler = CorsHandler.create().allowCredentials(true);
-        JsonArray relOrigins = webserviceConfig.getJsonArray("cors-relative-origins");
+        var router = Router.router(vertx);
+        var corsHandler = CorsHandler.create().allowCredentials(true);
+        var relOrigins = webserviceConfig.getJsonArray("cors-relative-origins");
         for (int i = 0; i < relOrigins.size(); i++) {
             corsHandler.addOriginWithRegex(relOrigins.getString(i));
         }

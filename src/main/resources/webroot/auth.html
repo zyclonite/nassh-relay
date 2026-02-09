@@ -1,4 +1,4 @@
-<html>
+<html lang="en">
 <head>
     <title>{{ APPLICATION_NAME }}</title>
     <style>
@@ -34,7 +34,7 @@
     <script src="https://apis.google.com/js/client:platform.js?onload=init" async defer></script>
 </head>
 <body>
-    <center>
+    <div style="text-align: center;">
         <div id="gConnect">
             <h1>Sign in with your Google account</h1>
             <button id="signinButton">Sign in</button>
@@ -46,7 +46,7 @@
             <h1>Authentication Error</h1>
             <pre id="authResult"></pre>
         </div>
-    </center>
+    </div>
     <script>
         const signinButton = document.getElementById('signinButton');
         const authResult = document.getElementById('authResult');

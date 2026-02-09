@@ -18,7 +18,7 @@ public class Session implements Shareable {
     private String handler;
     private int write_count;
     private int read_count;
-    private boolean active = true;
+    private boolean inactive;
 
     /**
      * @return the handler
@@ -63,16 +63,16 @@ public class Session implements Shareable {
     }
 
     /**
-     * @return the active
+     * @return if inactive
      */
-    public boolean isActive() {
-        return active;
+    public boolean isInactive() {
+        return inactive;
     }
 
     /**
-     * @param active the active to set
+     * @param inactive setter
      */
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setInactive(boolean inactive) {
+        this.inactive = inactive;
     }
 }

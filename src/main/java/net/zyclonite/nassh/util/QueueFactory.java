@@ -19,10 +19,8 @@ public class QueueFactory {
 
     private final static Map<String, TransferQueue> queues = new HashMap<>();
 
-    public static TransferQueue createQueue(final String name) {
-        final TransferQueue queue = new TransferQueue();
-        queues.put(name, queue);
-        return queue;
+    public static void createQueue(final String name) {
+        queues.put(name, new TransferQueue());
     }
 
     public static TransferQueue getQueue(final String name) throws NoSuchQueueException {

@@ -12,8 +12,6 @@ package net.zyclonite.nassh.handler;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.internal.VertxInternal;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -27,7 +25,6 @@ import net.zyclonite.nassh.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.net.InetAddress;
 import java.util.UUID;
 
 /**
@@ -61,8 +58,8 @@ public class ProxyHandler implements Handler<RoutingContext> {
     @Override
     public void handle(final RoutingContext context) {
         logger.debug(() -> "got request");
-        final HttpServerRequest request = context.request();
-        final HttpServerResponse response = context.response();
+        var request = context.request();
+        var response = context.response();
         response.putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
         response.putHeader("Pragma", "no-cache");
         if (request.params().contains("host") && request.params().contains("port")) {
@@ -75,11 +72,11 @@ public class ProxyHandler implements Handler<RoutingContext> {
                     return;
                 }
             }
-            final AuthSession authSession = authPreSession;
-            final String host = request.params().get("host");
-            final int port = Integer.parseInt(request.params().get("port"));
-            final UUID sid = UUID.randomUUID();
-            final String clienthost = RequestHelper.getRemoteHost(request);
+            var authSession = authPreSession;
+            var host = request.params().get("host");
+            var port = Integer.parseInt(request.params().get("port"));
+            var sid = UUID.randomUUID();
+            var clienthost = RequestHelper.getRemoteHost(request);
             if (sessions.size() >= sessionlimit) {
                 response.setStatusCode(410);
                 response.end("session limit reached");
@@ -88,7 +85,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
             }
             vertx.nameResolver().resolve(host).andThen(result -> {
                 if (result.succeeded()) {
-                    final InetAddress address = result.result();
+                    var address = result.result();
                     vertx.executeBlocking(() -> AccessHelper.isHostAllowed(accessList, whiteList, blackList, address, authSession), false)
                         .onSuccess(isAllowed -> {
                             if (!isAllowed) {
@@ -124,15 +121,15 @@ public class ProxyHandler implements Handler<RoutingContext> {
     }
 
     private Promise<UUID> connectTcpEndpoint(final UUID sid, final String host, final int port, final String clienthost) {
-        final Promise<UUID> promise = Promise.promise();
+        var promise = Promise.<UUID>promise();
         client.connect(port, host).andThen(asyncResult -> {
             if (asyncResult.succeeded()) {
                 logger.info(() -> "Connected to ssh server: " + host + ":" + port + " (" + clienthost + ")");
                 QueueFactory.createQueue(sid.toString());
-                asyncResult.result().drainHandler(v -> asyncResult.result().resume());
+                asyncResult.result().drainHandler(_ -> asyncResult.result().resume());
                 asyncResult.result().handler(buffer -> {
                     try {
-                        final TransferQueue queue = QueueFactory.getQueue(sid.toString());
+                        var queue = QueueFactory.getQueue(sid.toString());
                         if (!queue.isFull()) {
                             queue.add(buffer);
                         } else {
@@ -142,12 +139,12 @@ public class ProxyHandler implements Handler<RoutingContext> {
                         logger.warn(() -> ex);
                     }
                 });
-                asyncResult.result().closeHandler(v -> {
+                asyncResult.result().closeHandler(_ -> {
                     logger.info(() -> "ssh server connection closed " + host + ":" + port);
                     QueueFactory.deleteQueue(sid.toString());
                     sessions.remove(sid.toString());
                 });
-                final Session session = new Session();
+                var session = new Session();
                 session.setHandler(asyncResult.result().writeHandlerID());
                 sessions.put(sid.toString(), session);
                 registerTimerOut(session, client);
@@ -168,7 +165,7 @@ public class ProxyHandler implements Handler<RoutingContext> {
             @Override
             public void handle(Long timerID) {
                 if ((session.getRead_count() <= readCount) && (session.getWrite_count() <= writeCount)) {
-                    session.setActive(false);
+                    session.setInactive(true);
                     if (client != null) {
                         client.close();
                     }

@@ -11,10 +11,6 @@ package net.zyclonite.nassh.handler;
 
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.http.HttpServerResponse;
-import io.vertx.core.shareddata.LocalMap;
 import io.vertx.ext.web.RoutingContext;
 import net.zyclonite.nassh.model.Session;
 import net.zyclonite.nassh.util.*;
@@ -38,14 +34,14 @@ public class ReadHandler implements Handler<RoutingContext> {
 
     @Override
     public void handle(final RoutingContext context) {
-        final HttpServerRequest request = context.request();
-        final HttpServerResponse response = context.response();
+        var request = context.request();
+        var response = context.response();
         response.putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
         response.putHeader("Pragma", "no-cache");
         if (request.params().contains("sid") && request.params().contains("rcnt")) {
-            final UUID sid = UUID.fromString(request.params().get("sid"));
-            final LocalMap<String, Session> map = vertx.sharedData().getLocalMap(Constants.SESSIONS);
-            final Session session = map.get(sid.toString());
+            var sid = UUID.fromString(request.params().get("sid"));
+            var map = vertx.sharedData().<String, Session>getLocalMap(Constants.SESSIONS);
+            var session = map.get(sid.toString());
             if (session == null) {
                 logger.warn(() -> "could not find valid session for " + sid);
                 response.setStatusCode(410);
@@ -63,11 +59,11 @@ public class ReadHandler implements Handler<RoutingContext> {
                 response.end();
                 return;
             }
-            final Buffer buffer = queue.poll();
+            var buffer = queue.poll();
             if (buffer == null) {
                 queue.addObserver(new TransferObserver(session, request));
             } else {
-                final String encodedBytes = Base64.getUrlEncoder().encodeToString(buffer.getBytes());
+                var encodedBytes = Base64.getUrlEncoder().encodeToString(buffer.getBytes());
                 response.setStatusCode(200);
                 response.end(encodedBytes);
             }

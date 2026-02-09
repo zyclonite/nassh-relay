@@ -9,7 +9,6 @@
  */
 package net.zyclonite.nassh.util;
 
-import io.vertx.core.http.Cookie;
 import io.vertx.ext.web.RoutingContext;
 import net.zyclonite.nassh.model.AuthSession;
 
@@ -21,16 +20,16 @@ import java.util.UUID;
 public class WebHelper {
 
     public static AuthSession validateCookie(final RoutingContext context) {
-        final Cookie cookie = context.request().getCookie(Constants.SESSIONCOOKIE);
+        var cookie = context.request().getCookie(Constants.SESSIONCOOKIE);
         if (cookie == null) {
             return null;
         }
-        final UUID sessioncookie = UUID.fromString(cookie.getValue());
-        final AuthSession session = AuthSessionManager.getSession(sessioncookie);
+        var sessioncookie = UUID.fromString(cookie.getValue());
+        var session = AuthSessionManager.getSession(sessioncookie);
         if (session == null) {
             return null;
         }
-        final String id = session.get("id");
+        var id = session.get("id");
         if (id != null) {
             return session;
         }

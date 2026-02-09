@@ -12,9 +12,6 @@ package net.zyclonite.nassh.handler;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.http.HttpServerResponse;
-import io.vertx.core.shareddata.LocalMap;
 import io.vertx.ext.web.RoutingContext;
 import net.zyclonite.nassh.model.Session;
 import net.zyclonite.nassh.util.Constants;
@@ -35,23 +32,23 @@ public class WriteHandler implements Handler<RoutingContext> {
 
     @Override
     public void handle(final RoutingContext context) {
-        final HttpServerRequest request = context.request();
-        final HttpServerResponse response = context.response();
+        var request = context.request();
+        var response = context.response();
         response.putHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
         response.putHeader("Pragma", "no-cache");
         if (request.params().contains("sid") && request.params().contains("wcnt") && request.params().contains("data")) {
-            final UUID sid = UUID.fromString(request.params().get("sid"));
-            final byte[] data = Base64.getUrlDecoder().decode(request.params().get("data"));
+            var sid = UUID.fromString(request.params().get("sid"));
+            var data = Base64.getUrlDecoder().decode(request.params().get("data"));
             response.setStatusCode(200);
-            final LocalMap<String, Session> map = vertx.sharedData().getLocalMap(Constants.SESSIONS);
-            final Session session = map.get(sid.toString());
+            var map = vertx.sharedData().<String, Session>getLocalMap(Constants.SESSIONS);
+            var session = map.get(sid.toString());
             if (session == null) {
                 response.setStatusCode(410);
                 response.end();
                 return;
             }
             session.setWrite_count(Integer.parseInt(request.params().get("wcnt")));
-            final Buffer message = Buffer.buffer();
+            var message = Buffer.buffer();
             message.appendBytes(data);
             vertx.eventBus().publish(session.getHandler(), message);
             response.end();

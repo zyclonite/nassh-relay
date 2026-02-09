@@ -27,7 +27,7 @@ public class AccessHelper {
 
     public static boolean isHostAllowed(final JsonArray accesslist, final JsonArray whitelist, final JsonArray blacklist, final InetAddress address, final AuthSession authSession) {
         if (authSession != null) {
-            final boolean access = accesslist.stream().map(l -> (JsonObject) l)
+            var access = accesslist.stream().map(l -> (JsonObject) l)
                 .filter(item -> filterUser(item, authSession))
                 .anyMatch(item -> checkAccess(item.getJsonArray("access"), address));
             if (access) {
@@ -41,9 +41,9 @@ public class AccessHelper {
     }
 
     private static boolean filterUser(final JsonObject listItem, final AuthSession authSession) {
-        final String id = authSession.get("id");
-        final String domain = authSession.get("domain");
-        final String email = authSession.get("email");
+        var id = authSession.get("id");
+        var domain = authSession.get("domain");
+        var email = authSession.get("email");
         if (listItem.containsKey("id") && id != null && listItem.getString("id").equals(id)) {
             return true;
         }
@@ -77,7 +77,7 @@ public class AccessHelper {
 
     private static boolean checkHost(final String block, final InetAddress address) {
         try {
-            final InetAddress blk = InetAddress.getByName(block);
+            var blk = InetAddress.getByName(block);
             if (address.getHostAddress().equals(blk.getHostAddress())) {
                 return true;
             }
@@ -89,7 +89,7 @@ public class AccessHelper {
 
     private static boolean checkNetwork(final String block, final InetAddress address) {
         try {
-            final NetworkHelper netblk = new NetworkHelper(block);
+            var netblk = new NetworkHelper(block);
             if (netblk.isInRange(address)) {
                 return true;
             }

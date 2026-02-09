@@ -66,7 +66,7 @@ public class TransferQueue implements Queue<Buffer> {
             clearChanged();
         }
 
-        for (int i = arrLocal.length - 1; i >= 0; i--) {
+        for (var i = arrLocal.length - 1; i >= 0; i--) {
             arrLocal[i].update(this);
         }
     }
