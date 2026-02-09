@@ -24,7 +24,7 @@ COPY --from=maven /opt/java/openjdk-25-slim /usr/local/openjdk-25
 
 USER nobody
 
-ENTRYPOINT ["java", "--enable-native-access=ALL-UNNAMED", "-jar", "nassh-relay-app.jar" ]
+ENTRYPOINT ["java", "--enable-native-access=ALL-UNNAMED", "-XX:+UseZGC", "-XX:TrimNativeHeapInterval=5000", "-XX:+ExitOnOutOfMemoryError", "-XX:+AlwaysPreTouch", "-XX:+DisableExplicitGC", "-jar", "nassh-relay-app.jar" ]
 
 CMD ["-conf", "config.json"]
 
