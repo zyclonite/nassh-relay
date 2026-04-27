@@ -1,4 +1,4 @@
-FROM maven:3.9.12-eclipse-temurin-25 as maven
+FROM maven:3.9.15-eclipse-temurin-25 as maven
 
 WORKDIR /src
 
