@@ -4,7 +4,7 @@
 
     <groupId>net.zyclonite.nassh</groupId>
     <artifactId>nassh-relay</artifactId>
-    <version>1.1.41</version>
+    <version>1.1.42</version>
 
     <organization>
         <name>zyclonite networx</name>
@@ -19,8 +19,8 @@
     </developers>
 
     <properties>
-        <vertx.version>5.0.11</vertx.version>
-        <log4j.version>2.25.4</log4j.version>
+        <vertx.version>5.1.0</vertx.version>
+        <log4j.version>2.26.0</log4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -154,6 +154,7 @@
                                 <exclude>META-INF/maven/io.netty/*native*/pom.xml</exclude>
                                 <exclude>META-INF/maven/io.netty/*native*/pom.properties</exclude>
                                 <exclude>META-INF/LICENSE</exclude>
+                                <exclude>META-INF/*LICENSE</exclude>
                                 <exclude>META-INF/NOTICE</exclude>
                                 <exclude>META-INF/DEPENDENCIES</exclude>
                                 <exclude>META-INF/versions/*/module-info.class</exclude>
