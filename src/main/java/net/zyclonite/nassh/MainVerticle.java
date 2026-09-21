@@ -14,7 +14,6 @@ import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.net.SelfSignedCertificate;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.CorsHandler;
 import net.zyclonite.nassh.handler.*;
@@ -35,10 +34,8 @@ public class MainVerticle extends AbstractVerticle {
         }
         var options = new HttpServerOptions(webserviceConfig);
         if (options.isSsl() && options.getKeyCertOptions() == null) {
-            logger.warn(() -> "no certificate configured, creating self-signed");
-            var certificate = SelfSignedCertificate.create();
-            options.setKeyCertOptions(certificate.keyCertOptions());
-            options.setTrustOptions(certificate.trustOptions());
+            logger.warn(() -> "no certificate configured, falling back to plaintext");
+            options.setSsl(false);
         }
         server = vertx.createHttpServer(options);
         var router = Router.router(vertx);
