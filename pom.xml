@@ -19,7 +19,7 @@
     </developers>
 
     <properties>
-        <vertx.version>5.2.1</vertx.version>
+        <vertx.version>5.2.2</vertx.version>
         <log4j.version>2.26.1</log4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
